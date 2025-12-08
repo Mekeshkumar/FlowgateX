@@ -71,7 +71,8 @@ flowgatex/
 
 1. Clone the repository:
 ```bash
-cd flowgatex
+git clone https://github.com/Mekeshkumar/FlowgateX.git
+cd FlowgateX
 ```
 
 2. Install dependencies:
