@@ -1,4 +1,4 @@
-import { Auth } from '@features/auth/components';
+import Auth from '@pages/auth/Auth';
 
 const RegisterPage = () => {
   return <Auth initialView="register" />;
