@@ -1,0 +1,239 @@
+/* ===========================
+   Auth Page Styles
+   Integrates with FlowGateX Design System (index.css)
+=========================== */
+
+/* --- CSS Variables Extension for Auth --- */
+:root,
+[data-theme="dark"] {
+    --input-bg: #1A1A1A;
+    --border-hover: #444444;
+    --accent: #eb1616;
+    --primary-dark: #B91C1C;
+    --primary-100: rgba(235, 22, 22, 0.1);
+    --primary-200: rgba(235, 22, 22, 0.2);
+    --primary-hover: #EF4444;
+    --bg-surface: #0A0A0A;
+    --error: #EF4444;
+    --error-light: rgba(239, 68, 68, 0.15);
+    --warning: #F59E0B;
+    --info: #3B82F6;
+    --success: #10B981;
+    --z-toast: 9999;
+    --checkbox-tick: #fff;
+}
+
+[data-theme="light"] {
+    --input-bg: #F5F5F5;
+    --border-hover: #CCCCCC;
+    --bg-surface: #FAFAFA;
+    --error-light: rgba(239, 68, 68, 0.1);
+    --checkbox-tick: #222;
+}
+
+/* Ensure main auth container visibility */
+main {
+    display: flex !important;
+    min-height: 100vh !important;
+    width: 100% !important;
+    position: relative !important;
+}
+
+/* --- View Animations --- */
+.auth-view {
+    width: 100%;
+    animation: authFadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes authFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInFromRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse-glow {
+
+    0%,
+    100% {
+        box-shadow: 0 0 20px rgba(235, 22, 22, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 0 40px rgba(235, 22, 22, 0.5);
+    }
+}
+
+/* --- OTP Input Styling --- */
+.otp-input {
+    caret-color: var(--accent);
+    font-family: var(--font-mono);
+}
+
+.otp-input:focus {
+    transform: scale(1.05);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--primary-100);
+}
+
+/* --- Password Strength Meter --- */
+.password-strength {
+    height: 6px;
+    border-radius: var(--radius-full);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background-color: var(--bg-tertiary);
+}
+
+.strength-weak {
+    width: 25%;
+    background: linear-gradient(90deg, var(--error), #ff6b6b);
+}
+
+.strength-fair {
+    width: 50%;
+    background: linear-gradient(90deg, var(--warning), #ffc107);
+}
+
+.strength-good {
+    width: 75%;
+    background: linear-gradient(90deg, var(--info), #4dabf7);
+}
+
+.strength-strong {
+    width: 100%;
+    background: linear-gradient(90deg, var(--success), #51cf66);
+}
+
+/* --- Toast Notification --- */
+.toast {
+    animation: slideInFromRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* --- Custom Checkbox Styling --- */
+input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    position: relative;
+}
+
+input[type="checkbox"]:checked {
+    background: var(--gradient-primary);
+    border-color: var(--accent);
+}
+
+input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 5px;
+    height: 10px;
+    border: solid var(--checkbox-tick, white);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* --- Select Dropdown Styling --- */
+select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23808080' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+    padding-right: 48px;
+}
+
+select:focus {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23eb1616' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+/* --- Glass Effect for Cards --- */
+.glass-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="light"] .glass-card {
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* --- Hover States --- */
+.hover-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-red-md);
+}
+
+/* --- Loading Spinner Enhancement --- */
+.animate-spin {
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* --- Focus Ring Animation --- */
+@keyframes focus-ring-pulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 3px var(--primary-100);
+    }
+
+    50% {
+        box-shadow: 0 0 0 5px var(--primary-200);
+    }
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 1024px) {
+    .auth-view {
+        padding: 0 1rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .otp-input {
+        width: 2.5rem;
+        height: 3rem;
+        font-size: 1rem;
+    }
+}
+
+/* --- Decorative Background Pattern --- */
+.auth-pattern {
+    background-image: radial-gradient(circle at 1px 1px, var(--border-primary) 1px, transparent 0);
+    background-size: 40px 40px;
+}

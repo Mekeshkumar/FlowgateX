@@ -4,7 +4,7 @@ import { Card, Button } from '@components/common';
 import { Link } from 'react-router-dom';
 
 const OrganizerDashboard = () => {
-  const { user } = useAuth();
+  // const { user } = useAuth(); // Reserved for future use
 
   const stats = [
     { title: 'Total Events', value: '8', change: '+2 this month', changeType: 'positive', icon: 'event', iconBg: 'bg-blue-100', iconColor: 'text-blue-600' },

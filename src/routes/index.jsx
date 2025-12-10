@@ -1,13 +1,13 @@
 import { lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from '@hooks/useAuth';
 import ProtectedRoute from './ProtectedRoute';
 
 // Lazy load pages for code splitting
-const HomePage = lazy(() => import('@pages/common/HomePage'));
-const EventsPage = lazy(() => import('@pages/common/EventsPage'));
-const LoginPage = lazy(() => import('@pages/common/LoginPage'));
-const RegisterPage = lazy(() => import('@pages/common/RegisterPage'));
+const HomePage = lazy(() => import('@pages/public/HomePage'));
+const EventsPage = lazy(() => import('@pages/public/EventsPage'));
+const LoginPage = lazy(() => import('@pages/public/LoginPage'));
+const RegisterPage = lazy(() => import('@pages/public/RegisterPage'));
+const BookingPage = lazy(() => import('@pages/public/BookingPage'));
 
 const UserDashboard = lazy(() => import('@pages/user/Dashboard'));
 const BookingsPage = lazy(() => import('@pages/user/BookingsPage'));
@@ -15,21 +15,9 @@ const BookingsPage = lazy(() => import('@pages/user/BookingsPage'));
 const OrganizerDashboard = lazy(() => import('@pages/organizer/Dashboard'));
 
 const AdminDashboard = lazy(() => import('@pages/admin/Dashboard'));
+const LayoutPreview = lazy(() => import('@pages/public/LayoutPreview'));
 
 const AppRoutes = () => {
-  const { user } = useAuth();
-
-  const getDashboardRoute = () => {
-    switch (user?.role) {
-      case 'admin':
-        return '/admin/dashboard';
-      case 'organizer':
-        return '/organizer/dashboard';
-      default:
-        return '/dashboard';
-    }
-  };
-
   return (
     <Routes>
       {/* Public Routes */}
@@ -37,6 +25,13 @@ const AppRoutes = () => {
       <Route path="/events" element={<EventsPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/layout-preview" element={<LayoutPreview />} />
+
+      {/* Booking Flow - Can be accessed by anyone */}
+      <Route path="/booking/:eventId" element={<BookingPage />} />
+
+      {/* Booking page at /bookings endpoint */}
+      <Route path="/bookings" element={<BookingPage />} />
 
       {/* User Routes */}
       <Route
@@ -48,7 +43,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/bookings"
+        path="/my-bookings"
         element={
           <ProtectedRoute>
             <BookingsPage />

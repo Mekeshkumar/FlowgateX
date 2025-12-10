@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import classNames from 'classnames';
-import { Button } from '@components/common';
 
 const ChatbotWidget = () => {
   const [isOpen, setIsOpen] = useState(false);

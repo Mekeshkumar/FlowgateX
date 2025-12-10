@@ -42,7 +42,7 @@ const UserDashboard = () => {
         <h1 className="text-2xl font-bold text-gray-900">
           Welcome back, {user?.name || 'User'}! 👋
         </h1>
-        <p className="text-gray-500">Here's what's happening with your events.</p>
+        <p className="text-gray-500">Here&apos;s what&apos;s happening with your events.</p>
       </div>
 
       {/* Stats Grid */}

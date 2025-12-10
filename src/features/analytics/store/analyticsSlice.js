@@ -31,7 +31,7 @@ const analyticsSlice = createSlice({
         setError: (state, action) => {
             state.error = action.payload;
         },
-        clearAnalytics: (state) => {
+        clearAnalytics: () => {
             return initialState;
         },
     },

@@ -1,0 +1,54 @@
+{
+    "workbench.iconTheme": "material-icon-theme",
+    "files.autoSave": "onFocusChange",
+    "python.defaultInterpreterPath": "C:\\Users\\MONEESH\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+    "editor.formatOnSave": true,
+    "editor.codeActions.triggerOnFocusChange": true,
+    "notebook.formatOnSave.enabled": true,
+    "files.autoSaveWhenNoErrors": true,
+    "files.autoSaveWorkspaceFilesOnly": true,
+    "[html]": {
+        "editor.defaultFormatter": "vscode.html-language-features"
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "[css]": {
+        "editor.defaultFormatter": "vscode.css-language-features"
+    },
+    "security.workspace.trust.untrustedFiles": "open",
+    "editor.unicodeHighlight.invisibleCharacters": false,
+    "editor.unicodeHighlight.ambiguousCharacters": false,
+    "fiveServer.browser": [],
+    "fiveServer.injectBody": true,
+    "fiveServer.highlight": true,
+    "fiveServer.port": 5000,
+    "github.copilot.nextEditSuggestions.enabled": true,
+    "explorer.confirmDelete": false,
+    "git.openRepositoryInParentFolders": "never",
+    "terminal.integrated.defaultProfile.windows": "Command Prompt",
+    "gitlens.ai.model": "vscode",
+    "gitlens.ai.vscode.model": "copilot:gpt-4.1",
+    "[javascriptreact]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "chat.agent.maxRequests": 5000,
+    "chat.agent.thinking.collapsedTools": "all",
+    "chat.allowAnonymousAccess": true,
+    "chat.mcp.discovery.enabled": {
+        "claude-desktop": true
+    },
+    "chat.mcp.gallery.enabled": true,
+    "chat.renderRelatedFiles": true,
+    "chat.todoListTool.writeOnly": true,
+    "chat.tools.global.autoApprove": true,
+    "chat.tools.terminal.autoReplyToPrompts": true,
+    "chat.tools.terminal.ignoreDefaultAutoApproveRules": true,
+    "inlineChat.enableV2": true,
+    "chat.useNestedAgentsMdFiles": true,
+    "inlineChat.finishOnType": true,
+    "inlineChat.lineEmptyHint": true,
+    "inlineChat.notebookAgent": true,
+    "settingsSync.ignoredExtensions": []
+}
+

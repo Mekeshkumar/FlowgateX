@@ -1,6 +1,6 @@
 module.exports = {
     root: true,
-    env: { browser: true, es2020: true },
+    env: { browser: true, es2020: true, node: true },
     extends: [
         'eslint:recommended',
         'plugin:react/recommended',
@@ -20,4 +20,13 @@ module.exports = {
         'no-unused-vars': 'warn',
         'no-console': 'warn',
     },
+    overrides: [
+        {
+            files: ['backend/**/*.js'],
+            env: { node: true, browser: false },
+            rules: {
+                'no-console': 'off', // Allow console in backend
+            },
+        },
+    ],
 };

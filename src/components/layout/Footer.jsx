@@ -3,139 +3,138 @@ import { Link } from 'react-router-dom';
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
-  const footerLinks = {
-    product: [
-      { name: 'Features', href: '/features' },
-      { name: 'Pricing', href: '/pricing' },
-      { name: 'Events', href: '/events' },
-      { name: 'For Organizers', href: '/organizers' },
-    ],
-    company: [
-      { name: 'About', href: '/about' },
-      { name: 'Careers', href: '/careers' },
-      { name: 'Blog', href: '/blog' },
-      { name: 'Contact', href: '/contact' },
-    ],
-    support: [
-      { name: 'Help Center', href: '/help' },
-      { name: 'FAQs', href: '/faq' },
-      { name: 'Privacy Policy', href: '/privacy' },
-      { name: 'Terms of Service', href: '/terms' },
-    ],
-  };
-
   const socialLinks = [
-    { name: 'Twitter', icon: 'twitter', href: '#' },
-    { name: 'Facebook', icon: 'facebook', href: '#' },
-    { name: 'Instagram', icon: 'instagram', href: '#' },
-    { name: 'LinkedIn', icon: 'linkedin', href: '#' },
+    { name: 'facebook', icon: 'facebook' },
+    { name: 'twitter', icon: 'tag' },
+    { name: 'instagram', icon: 'photo_camera' },
+    { name: 'linkedin', icon: 'work' },
   ];
 
+  const companyLinks = ['About Us', 'How It Works', 'Pricing', 'Blog', 'Careers'];
+  const userLinks = ['Browse Events', 'My Bookings', 'Help Center', 'Mobile App'];
+  const organizerLinks = ['Create Event', 'Dashboard', 'API Docs', 'Resources'];
+  const legalLinks = ['Privacy Policy', 'Terms of Service', 'Refund Policy', 'Cookie Settings'];
+
   return (
-    <footer className="bg-gray-900 text-gray-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {/* Brand */}
-          <div className="col-span-2 md:col-span-1">
-            <Link to="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-primary-400 rounded-lg flex items-center justify-center">
-                <span className="material-icons text-white text-lg">bolt</span>
-              </div>
-              <span className="font-display font-bold text-xl text-white">
-                FlowGate<span className="text-primary-400">X</span>
+    <footer className="bg-[var(--bg-primary)] border-t border-[var(--border-primary)]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 mb-12">
+          {/* Brand Column */}
+          <div className="col-span-2 lg:col-span-2">
+            <Link to="/" className="flex items-center gap-3 mb-6">
+              <span className="material-icons-outlined text-3xl text-[var(--brand-primary)]">auto_awesome</span>
+              <span
+                className="text-2xl font-bold text-[var(--text-primary)]"
+                style={{ fontFamily: 'var(--font-heading)' }}
+              >
+                FlowGate<span className="text-[var(--brand-primary)]">X</span>
               </span>
             </Link>
-            <p className="text-sm text-gray-400 mb-4">
-              Modern event management platform with real-time IoT integrations and
-              seamless booking experience.
+            <p className="text-[var(--text-secondary)] mb-6 max-w-xs">
+              The most advanced event management platform powered by IoT and AI technology.
             </p>
-            <div className="flex gap-4">
+            {/* Social Icons */}
+            <div className="flex gap-3">
               {socialLinks.map((social) => (
                 <a
                   key={social.name}
-                  href={social.href}
-                  className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-800 hover:bg-gray-700 transition-colors"
-                  aria-label={social.name}
+                  href={`https://${social.name}.com`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)] flex items-center justify-center text-[var(--text-tertiary)] hover:text-[var(--brand-primary)] hover:border-[var(--brand-primary)] transition-all"
                 >
-                  <span className="text-sm">{social.icon[0].toUpperCase()}</span>
+                  <span className="material-icons-outlined text-lg">{social.icon}</span>
                 </a>
               ))}
             </div>
           </div>
 
-          {/* Product Links */}
+          {/* Company */}
           <div>
-            <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">
-              Product
-            </h4>
-            <ul className="space-y-2">
-              {footerLinks.product.map((link) => (
-                <li key={link.name}>
+            <h4 className="font-bold text-[var(--text-primary)] mb-4">Company</h4>
+            <ul className="space-y-3">
+              {companyLinks.map((item) => (
+                <li key={item}>
                   <Link
-                    to={link.href}
-                    className="text-sm hover:text-white transition-colors"
+                    to={`/${item.toLowerCase().replace(' ', '-')}`}
+                    className="text-[var(--text-secondary)] hover:text-[var(--brand-primary)] transition-colors"
                   >
-                    {link.name}
+                    {item}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Company Links */}
+          {/* For Users */}
           <div>
-            <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">
-              Company
-            </h4>
-            <ul className="space-y-2">
-              {footerLinks.company.map((link) => (
-                <li key={link.name}>
+            <h4 className="font-bold text-[var(--text-primary)] mb-4">For Users</h4>
+            <ul className="space-y-3">
+              {userLinks.map((item) => (
+                <li key={item}>
                   <Link
-                    to={link.href}
-                    className="text-sm hover:text-white transition-colors"
+                    to={`/${item.toLowerCase().replace(' ', '-')}`}
+                    className="text-[var(--text-secondary)] hover:text-[var(--brand-primary)] transition-colors"
                   >
-                    {link.name}
+                    {item}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Support Links */}
+          {/* For Organizers */}
           <div>
-            <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">
-              Support
-            </h4>
-            <ul className="space-y-2">
-              {footerLinks.support.map((link) => (
-                <li key={link.name}>
+            <h4 className="font-bold text-[var(--text-primary)] mb-4">For Organizers</h4>
+            <ul className="space-y-3">
+              {organizerLinks.map((item) => (
+                <li key={item}>
                   <Link
-                    to={link.href}
-                    className="text-sm hover:text-white transition-colors"
+                    to={`/${item.toLowerCase().replace(' ', '-')}`}
+                    className="text-[var(--text-secondary)] hover:text-[var(--brand-primary)] transition-colors"
                   >
-                    {link.name}
+                    {item}
                   </Link>
                 </li>
               ))}
+            </ul>
+          </div>
+
+          {/* Contact */}
+          <div>
+            <h4 className="font-bold text-[var(--text-primary)] mb-4">Contact</h4>
+            <ul className="space-y-3">
+              <li className="flex items-center gap-2 text-[var(--text-secondary)]">
+                <span className="material-icons-outlined text-base text-[var(--brand-primary)]">email</span>
+                support@flowgatex.com
+              </li>
+              <li className="flex items-center gap-2 text-[var(--text-secondary)]">
+                <span className="material-icons-outlined text-base text-[var(--brand-primary)]">phone</span>
+                +91 1800-123-4567
+              </li>
+              <li className="flex items-center gap-2 text-[var(--text-secondary)]">
+                <span className="material-icons-outlined text-base text-[var(--brand-primary)]">location_on</span>
+                Mumbai, India
+              </li>
             </ul>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-gray-400">
-            &copy; {currentYear} FlowGateX. All rights reserved.
+        <div className="pt-8 border-t border-[var(--border-primary)] flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-sm text-[var(--text-tertiary)]">
+            © {currentYear} FlowGateX. All rights reserved.
           </p>
-          <div className="flex gap-6">
-            <Link to="/privacy" className="text-sm hover:text-white transition-colors">
-              Privacy
-            </Link>
-            <Link to="/terms" className="text-sm hover:text-white transition-colors">
-              Terms
-            </Link>
-            <Link to="/cookies" className="text-sm hover:text-white transition-colors">
-              Cookies
-            </Link>
+          <div className="flex items-center gap-6 text-sm">
+            {legalLinks.map((item) => (
+              <Link
+                key={item}
+                to={`/${item.toLowerCase().replace(' ', '-')}`}
+                className="text-[var(--text-tertiary)] hover:text-[var(--brand-primary)] transition-colors"
+              >
+                {item}
+              </Link>
+            ))}
           </div>
         </div>
       </div>

@@ -5,3 +5,4 @@ export { default as Modal } from './Modal';
 export { default as Avatar } from './Avatar';
 export { default as LoadingSpinner } from './LoadingSpinner';
 export { default as EmptyState } from './EmptyState';
+export { default as AIChatAssistant } from './AIChatAssistant';
