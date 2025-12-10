@@ -23,6 +23,11 @@ const config = {
         gatewayUrl: import.meta.env.VITE_IOT_GATEWAY_URL,
         mqttBroker: import.meta.env.VITE_MQTT_BROKER_URL,
     },
+    // New AI Config Section
+    ai: {
+        apiKey: import.meta.env.VITE_GEMINI_API_KEY,
+        model: import.meta.env.VITE_GEMINI_MODEL || 'gemini-1.5-flash',
+    },
     features: {
         chatbot: import.meta.env.VITE_ENABLE_CHATBOT === 'true',
         iot: import.meta.env.VITE_ENABLE_IOT === 'true',

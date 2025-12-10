@@ -1,198 +1,137 @@
+import config from '../../config';
+
 /**
  * Gemini AI Service for FlowGateX Chat Assistant
- * Uses Google's Gemini API for intelligent responses
+ * Uses Google's Gemini 1.5 Flash for high-speed, intelligent responses.
  */
 
-const GEMINI_API_KEY = 'AIzaSyD8YlNVHhSR1ouupTQ9OTZ48otM6ebFfrY';
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+const API_KEY = config.ai.apiKey;
+const MODEL_NAME = config.ai.model;
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent`;
 
 /**
- * Generate a system prompt based on user role
+ * Generate a context-aware system prompt based on user role
  */
 const getSystemPrompt = (role, userName) => {
-    const baseContext = `You are FlowBot, an AI assistant for FlowGateX - a modern event management platform with IoT-enabled access control, real-time analytics, and smart ticketing.
+    const baseContext = `You are FlowBot, the intelligent assistant for FlowGateX.
+    
+    Platform Context:
+    - IoT-enabled access control & QR entry
+    - Real-time crowd analytics
+    - Secure ticketing (Razorpay/Stripe)
+    
+    Your Personality:
+    - Helpful, concise, and professional yet friendly.
+    - Use emojis sparingly to lighten the tone.
+    - Keep answers short (max 3 sentences) unless asked for details.`;
 
-Key Platform Features:
-- QR code-based event entry with IoT gates
-- Real-time crowd monitoring and analytics
-- Secure payment processing (Razorpay, UPI, Cards)
-- Event discovery and booking system
-- Organizer dashboard for event management
+    const roleSpecifics = {
+        admin: `
+            User: Admin (${userName || 'System Admin'})
+            Capabilities: User management, system config, analytics oversight, IoT device control.
+            Goal: assist with platform administration and operational efficiency.`,
 
-Be helpful, concise, and friendly. Use emojis occasionally. Keep responses under 150 words unless more detail is needed.`;
+        organizer: `
+            User: Organizer (${userName || 'Event Host'})
+            Capabilities: Event creation, ticket management, revenue tracking, attendee check-in.
+            Goal: Help maximize ticket sales and streamline event logistics.`,
 
-    switch (role) {
-        case 'admin':
-            return `${baseContext}
+        user: `
+            User: Attendee (${userName || 'Guest'})
+            Capabilities: Browsing events, booking tickets, viewing QR codes.
+            Goal: Help find events and resolve booking issues.`
+    };
 
-You are speaking with ${userName || 'an Admin'}. They have ADMIN privileges and can:
-- Manage all users and organizers
-- Approve/reject events
-- View platform-wide analytics
-- Configure system settings
-- Access audit logs
-- Manage IoT devices
-
-Help them with platform administration, user management, system monitoring, and generating reports. Be professional and provide actionable insights.`;
-
-        case 'organizer':
-            return `${baseContext}
-
-You are speaking with ${userName || 'an Organizer'}. They can:
-- Create and manage events
-- Set up ticket types and pricing
-- View attendee lists and check-ins
-- Access sales and revenue analytics
-- Configure IoT gates for their events
-- Send communications to attendees
-
-Help them maximize event success, improve ticket sales, manage attendees, and use analytics effectively. Provide marketing tips when relevant.`;
-
-        default:
-            return `${baseContext}
-
-You are speaking with ${userName || 'a User'}. They can:
-- Browse and discover events
-- Book tickets and make payments
-- View their bookings and tickets
-- Get QR codes for event entry
-- Save favorite events
-- Leave reviews
-
-Help them find events, manage bookings, understand the platform, and resolve any issues. Be warm and welcoming.`;
-    }
+    return `${baseContext}\n${roleSpecifics[role] || roleSpecifics.user}`;
 };
 
 /**
- * Send a message to Gemini API and get a response
+ * Send a message to Gemini API
+ * @param {string} message - User's input text
+ * @param {string} role - User's role (admin/organizer/user)
+ * @param {string} userName - User's display name
+ * @param {Array} conversationHistory - Previous messages for context
  */
 export const sendMessageToGemini = async (message, role = 'user', userName = '', conversationHistory = []) => {
+    if (!API_KEY) {
+        console.error('Gemini API Key is missing');
+        return { success: false, message: "I'm not fully configured yet. Please check my API key." };
+    }
+
     try {
         const systemPrompt = getSystemPrompt(role, userName);
 
-        // Build conversation context
-        const contents = [
-            {
-                role: 'user',
-                parts: [{ text: systemPrompt }]
-            },
-            {
-                role: 'model',
-                parts: [{ text: 'Understood! I am FlowBot, ready to assist with FlowGateX. How can I help you today?' }]
-            }
-        ];
+        // Format history for Gemini API
+        // Note: Gemini uses 'user' and 'model' roles.
+        const historyParts = conversationHistory.slice(-6).map(msg => ({
+            role: msg.type === 'user' ? 'user' : 'model',
+            parts: [{ text: msg.text }]
+        }));
 
-        // Add conversation history (last 10 messages for context)
-        const recentHistory = conversationHistory.slice(-10);
-        recentHistory.forEach(msg => {
-            contents.push({
-                role: msg.type === 'user' ? 'user' : 'model',
-                parts: [{ text: msg.text }]
-            });
-        });
-
-        // Add current message
-        contents.push({
-            role: 'user',
-            parts: [{ text: message }]
-        });
-
-        const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                contents,
-                generationConfig: {
-                    temperature: 0.7,
-                    topK: 40,
-                    topP: 0.95,
-                    maxOutputTokens: 500,
+        const payload = {
+            contents: [
+                {
+                    role: 'user',
+                    parts: [{ text: systemPrompt }]
                 },
-                safetySettings: [
-                    {
-                        category: 'HARM_CATEGORY_HARASSMENT',
-                        threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-                    },
-                    {
-                        category: 'HARM_CATEGORY_HATE_SPEECH',
-                        threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-                    },
-                    {
-                        category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-                        threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-                    },
-                    {
-                        category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-                        threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-                    }
-                ]
-            }),
+                {
+                    role: 'model',
+                    parts: [{ text: "Understood. I am ready to assist as FlowBot." }]
+                },
+                ...historyParts,
+                {
+                    role: 'user',
+                    parts: [{ text: message }]
+                }
+            ],
+            generationConfig: {
+                temperature: 0.7,
+                topK: 40,
+                topP: 0.95,
+                maxOutputTokens: 250,
+            }
+        };
+
+        const response = await fetch(`${GEMINI_API_URL}?key=${API_KEY}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error?.message || 'Failed to get response from AI');
+            const err = await response.json();
+            throw new Error(err.error?.message || 'API Request Failed');
         }
 
         const data = await response.json();
+        const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
-        // Extract the response text
-        const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-        if (!responseText) {
-            throw new Error('No response generated');
-        }
+        if (!aiResponse) throw new Error('Empty response from AI');
 
         return {
             success: true,
-            message: responseText.trim()
+            message: aiResponse.trim()
         };
 
     } catch (error) {
-        // Return a fallback response
+        console.error('Gemini AI Error:', error);
         return {
             success: false,
-            message: getFallbackResponse(message, role),
+            message: getFallbackResponse(message),
             error: error.message
         };
     }
 };
 
 /**
- * Fallback responses when API fails
+ * Offline fallback logic
  */
-const getFallbackResponse = (input, role) => {
-    const lowerInput = input.toLowerCase();
-
-    // Common responses
-    if (lowerInput.includes('hello') || lowerInput.includes('hi') || lowerInput.includes('hey')) {
-        return "Hey there! 👋 I'm having a bit of trouble connecting right now, but I'm still here to help! What would you like to know?";
-    }
-
-    if (lowerInput.includes('help')) {
-        return "I'd love to help! While I'm having connection issues, you can: 1) Browse events on the Events page, 2) Check your bookings in the Dashboard, 3) Contact support at support@flowgatex.com";
-    }
-
-    if (lowerInput.includes('event')) {
-        return "For event-related queries, please visit our Events page to browse and book. If you need specific help, contact support@flowgatex.com 📧";
-    }
-
-    if (lowerInput.includes('booking') || lowerInput.includes('ticket')) {
-        return "You can view your bookings in the Dashboard → My Bookings section. Your QR codes for entry are available there too! 🎫";
-    }
-
-    // Role-specific fallbacks
-    if (role === 'admin') {
-        return "I'm experiencing connection issues. For urgent admin matters, please check the Admin Dashboard directly or contact the tech team.";
-    }
-
-    if (role === 'organizer') {
-        return "Connection issues on my end! For event management, head to your Organizer Dashboard. For urgent support: support@flowgatex.com";
-    }
-
-    return "I'm having trouble connecting to my brain right now 🤖 Please try again in a moment, or contact support@flowgatex.com for immediate assistance!";
+const getFallbackResponse = (input) => {
+    const text = input.toLowerCase();
+    if (text.includes('ticket') || text.includes('book')) return "You can manage bookings in your Dashboard. 🎫";
+    if (text.includes('event')) return "Check out the Events page for upcoming activities! 🎉";
+    if (text.includes('support')) return "Contact us at support@flowgatex.com 📧";
+    return "I'm having trouble connecting to the cloud right now. Please try again in a moment. 🤖";
 };
 
 export default sendMessageToGemini;

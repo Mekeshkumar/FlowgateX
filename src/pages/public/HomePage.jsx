@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { EventCard } from '@features/events/components';
+import { mockEvents } from '../../data/mockEvents';
 
 // Lazy load AOS only when needed
 let AOS;
@@ -31,105 +32,12 @@ const CountUpNumber = ({ target, duration = 2000, decimals = 0, suffix = '' }) =
   return <>{decimals > 0 ? count.toFixed(decimals) : Math.floor(count)}{suffix}</>;
 };
 
-// Move static data outside component to prevent recreation on each render
+// Static data defined outside component to prevent recreation
 const STATS_DATA = [
   { value: '10K+', numValue: 10000, label: 'Events Hosted', icon: 'celebration' },
   { value: '500K+', numValue: 500000, label: 'Tickets Sold', icon: 'confirmation_number' },
   { value: '50K+', numValue: 50000, label: 'Happy Users', icon: 'groups' },
   { value: '99.9%', numValue: 99.9, label: 'Platform Uptime', icon: 'speed' },
-];
-
-const UPCOMING_EVENTS = [
-  {
-    id: 1,
-    title: 'Tech Summit 2025',
-    description: 'Join industry leaders for cutting-edge tech discussions, hands-on workshops, and networking opportunities. Explore AI, cloud computing, cybersecurity, and more.',
-    image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800',
-    date: '2025-01-15',
-    time: '09:00',
-    location: 'Mumbai, India',
-    price: 2999,
-    capacity: 500,
-    attendees: 455,
-    category: 'Conference',
-    isFeatured: true,
-    organizer: 'TechWorld Events',
-  },
-  {
-    id: 2,
-    title: 'Winter Music Festival',
-    description: 'Experience an unforgettable night of live performances featuring top artists. Food stalls, art installations, and an electrifying atmosphere await!',
-    image: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=800',
-    date: '2025-01-20',
-    time: '18:00',
-    location: 'Delhi, India',
-    price: 1499,
-    capacity: 2000,
-    attendees: 1880,
-    category: 'Concert',
-    isFeatured: false,
-    organizer: 'SoundWave Productions',
-  },
-  {
-    id: 3,
-    title: 'Startup Networking Night',
-    description: 'Connect with founders, investors, and innovators. Pitch your ideas, find co-founders, and build lasting business relationships.',
-    image: 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=800',
-    date: '2025-01-25',
-    time: '19:00',
-    location: 'Bangalore, India',
-    price: 999,
-    capacity: 150,
-    attendees: 120,
-    category: 'Networking',
-    isFeatured: false,
-    organizer: 'StartupHub India',
-  },
-  {
-    id: 4,
-    title: 'AI & ML Workshop',
-    description: 'Hands-on workshop covering machine learning fundamentals, neural networks, and real-world AI applications. Suitable for beginners and intermediates.',
-    image: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800',
-    date: '2025-02-01',
-    time: '10:00',
-    location: 'Hyderabad, India',
-    price: 1999,
-    capacity: 80,
-    attendees: 65,
-    category: 'Workshop',
-    isFeatured: true,
-    organizer: 'AI Academy',
-  },
-  {
-    id: 5,
-    title: 'Esports Championship',
-    description: 'Compete in VALORANT, CS2, and FIFA tournaments with prizes worth ₹5 lakhs. Live commentary, gaming zones, and exciting giveaways!',
-    image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800',
-    date: '2025-02-10',
-    time: '14:00',
-    location: 'Pune, India',
-    price: 799,
-    capacity: 500,
-    attendees: 300,
-    category: 'Gaming',
-    isFeatured: false,
-    organizer: 'GamersArena',
-  },
-  {
-    id: 6,
-    title: 'Art & Culture Fest',
-    description: 'Celebrate heritage with traditional art exhibitions, folk performances, craft workshops, and culinary delights from across India.',
-    image: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=800',
-    date: '2025-02-15',
-    time: '11:00',
-    location: 'Jaipur, India',
-    price: 599,
-    capacity: 300,
-    attendees: 300,
-    category: 'Festival',
-    isFeatured: false,
-    organizer: 'Cultural Connect',
-  },
 ];
 
 const BENEFITS = [
@@ -272,7 +180,6 @@ const HomePage = () => {
         });
       });
     }, 100);
-
     return () => clearTimeout(timer);
   }, []);
 
@@ -296,7 +203,6 @@ const HomePage = () => {
     if (statsRef.current) {
       observer.observe(statsRef.current);
     }
-
     return () => observer.disconnect();
   }, [statsVisible]);
 
@@ -314,7 +220,6 @@ const HomePage = () => {
       currentStep++;
       const progress = currentStep / steps;
       const easeOut = 1 - Math.pow(1 - progress, 3);
-
       setAnimatedStats(targets.map((target) => Math.floor(target * easeOut)));
 
       if (currentStep >= steps) {
@@ -352,10 +257,10 @@ const HomePage = () => {
               <span className="material-icons-outlined">close</span>
             </button>
 
-            {/* Video Embed - Replace with your actual video URL */}
+            {/* Video Embed */}
             <iframe
               className="w-full h-full"
-              src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
+              src="src/assets/Video/FlowgateX_Intro.mp4"
               title="FlowGateX Demo"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -376,9 +281,7 @@ const HomePage = () => {
             alt=""
             aria-hidden="true"
             className="w-full h-full object-cover"
-            style={{
-              transform: 'scale(1.2)',
-            }}
+            style={{ transform: 'scale(1.2)' }}
           />
         </div>
 
@@ -392,8 +295,7 @@ const HomePage = () => {
         <div
           className="absolute inset-0 z-[3] opacity-[0.02]"
           style={{
-            backgroundImage:
-              'linear-gradient(var(--brand-primary) 1px, transparent 1px), linear-gradient(90deg, var(--brand-primary) 1px, transparent 1px)',
+            backgroundImage: 'linear-gradient(var(--brand-primary) 1px, transparent 1px), linear-gradient(90deg, var(--brand-primary) 1px, transparent 1px)',
             backgroundSize: '60px 60px',
           }}
         />
@@ -519,20 +421,18 @@ const HomePage = () => {
                         <div className="absolute bottom-0 left-0 w-12 h-12 border-b-4 border-l-4 border-[var(--brand-primary)] rounded-bl-3xl"></div>
                         <div className="absolute bottom-0 right-0 w-12 h-12 border-b-4 border-r-4 border-[var(--brand-primary)] rounded-br-3xl"></div>
                       </div>
-                      {/* Scanning Line Animation - Going Up and Down */}
+                      {/* Scanning Line Animation */}
                       <div className="absolute inset-4 overflow-hidden rounded-2xl">
                         <div
                           className="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-[var(--brand-primary)] to-transparent shadow-lg shadow-[var(--brand-primary)]"
-                          style={{
-                            animation: 'scanLine 2s ease-in-out infinite',
-                          }}
+                          style={{ animation: 'scanLine 2s ease-in-out infinite' }}
                         ></div>
                         <style>{`
-                                  @keyframes scanLine {
-                                  0%, 100% { top: 0; }
-                                  50% { top: calc(100% - 4px); }
-                                  }
-                                  `}</style>
+                          @keyframes scanLine {
+                          0%, 100% { top: 0; }
+                          50% { top: calc(100% - 4px); }
+                          }
+                        `}</style>
                       </div>
                       <div className="absolute inset-0 flex items-center justify-center">
                         <span className="material-icons-outlined text-8xl text-[var(--brand-primary)]/50">qr_code_2</span>
@@ -602,8 +502,8 @@ const HomePage = () => {
       </section>
 
       {/* ===========================
-            STATS SECTION - MODERN DESIGN
-              =========================== */}
+            STATS SECTION
+      =========================== */}
       <section ref={statsRef} className="relative py-24 overflow-hidden">
         {/* Background */}
         <div className="absolute inset-0 bg-gradient-to-b from-[var(--bg-secondary)] via-[var(--bg-primary)] to-[var(--bg-secondary)]" />
@@ -618,8 +518,7 @@ const HomePage = () => {
         <div
           className="absolute inset-0 opacity-[0.02]"
           style={{
-            backgroundImage:
-              'linear-gradient(var(--brand-primary) 1px, transparent 1px), linear-gradient(90deg, var(--brand-primary) 1px, transparent 1px)',
+            backgroundImage: 'linear-gradient(var(--brand-primary) 1px, transparent 1px), linear-gradient(90deg, var(--brand-primary) 1px, transparent 1px)',
             backgroundSize: '40px 40px',
           }}
         />
@@ -739,8 +638,8 @@ const HomePage = () => {
       </section>
 
       {/* ===========================
-            UPCOMING EVENTS CAROUSEL
-              =========================== */}
+          UPCOMING EVENTS CAROUSEL
+      =========================== */}
       <section className="py-20 bg-[var(--bg-primary)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section Header */}
@@ -767,7 +666,7 @@ const HomePage = () => {
           {/* Events Grid/Carousel */}
           <div className="relative">
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {UPCOMING_EVENTS.slice(0, 6).map((event, index) => (
+              {mockEvents.slice(0, 6).map((event, index) => (
                 <div
                   key={event.id}
                   data-aos="fade-up"
@@ -1133,7 +1032,7 @@ const HomePage = () => {
       {/* ===========================
           FINAL CTA SECTION - MODERN DESIGN
       =========================== */}
-      <section className="relative py-32 overflow-hidden">
+      <section className="relative py-10 overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0 bg-[var(--bg-primary)]" />
 
