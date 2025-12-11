@@ -1,7 +1,7 @@
 import Auth from '@pages/auth/Auth';
 
-const RegisterPage = () => {
-  return <Auth initialView="register" />;
+const RegisterPage = (props) => {
+  return <Auth initialView="register" {...props} />;
 };
 
 export default RegisterPage;

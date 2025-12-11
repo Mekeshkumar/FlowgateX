@@ -177,7 +177,7 @@ const EventCard = ({
             {/* Location */}
             <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
               <span className="material-icons-outlined text-base text-[var(--brand-primary)]">location_on</span>
-              <span className="truncate">{location}</span>
+              <span className="truncate">{location?.venue || 'No location'}</span>
             </div>
           </div>
 

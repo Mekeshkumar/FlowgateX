@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { useAuthContext } from '@context/AuthContext';
 import {
   mockEvents,
   eventCategories,
@@ -10,6 +11,7 @@ import EventCard from '../../features/events/components/EventCard';
 import EventFilterModal, { FilterButton } from '../../features/events/components/EventFilterModal';
 
 const EventsPage = () => {
+  const { user, isAuthenticated } = useAuthContext();
   // STATE
   const [searchParams, setSearchParams] = useSearchParams();
   const [viewMode, setViewMode] = useState('grid');
@@ -257,16 +259,44 @@ const EventsPage = () => {
   }, []);
 
   // RENDER
+  // DEBUG: Output key state for troubleshooting
+  const debugInfo = {
+    filteredEventsLength: filteredEvents.length,
+    isLoading,
+    viewMode,
+    currentPage,
+    totalPages,
+    searchQuery,
+    filters,
+    sortBy,
+    paginatedEventsLength: paginatedEvents.length,
+    mockEventsLength: mockEvents.length,
+    error: filteredEvents.length === 0 ? 'No events after filtering' : null
+  };
+
   return (
     <div className="w-full bg-[var(--bg-primary)] text-[var(--text-primary)]">
+      {/* DEBUG PANEL - REMOVE IN PRODUCTION */}
+      <div style={{ position: 'fixed', top: 0, right: 0, zIndex: 9999, background: '#fff', color: '#000', padding: '8px', fontSize: '12px', maxWidth: '350px', border: '1px solid #f00', borderRadius: '0 0 0 8px', boxShadow: '0 2px 8px #0002' }}>
+        <strong>DEBUG:</strong>
+        <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', margin: 0 }}>{JSON.stringify(debugInfo, null, 2)}</pre>
+      </div>
 
       {/* Hero Section - Full Width */}
       <section className="relative w-full bg-gradient-to-br from-[var(--bg-secondary)] to-[var(--bg-primary)] border-b border-[var(--border-primary)]">
         <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-5xl font-heading font-bold text-[var(--text-primary)] mb-4 tracking-tight">
-              Discover Amazing Events
-            </h1>
+          <div className="flex flex-col items-center justify-center gap-4 text-center mb-8">
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <h1 className="text-4xl md:text-5xl font-heading font-bold text-[var(--text-primary)] tracking-tight">
+                Discover Amazing Events
+              </h1>
+              {isAuthenticated && (user?.role === 'admin' || user?.role === 'organizer') && (
+                <Link to="/organizer/create" className="btn-primary py-2 px-6 rounded-xl flex items-center gap-2 shadow-red-md whitespace-nowrap">
+                  <span className="material-icons-outlined">add</span>
+                  Create Event
+                </Link>
+              )}
+            </div>
             <p className="text-[var(--text-secondary)] text-lg max-w-2xl mx-auto font-light">
               Find and book the best events happening around you — concerts, meetups, workshops and more.
             </p>
@@ -600,4 +630,12 @@ const EventsPage = () => {
   );
 };
 
-export default EventsPage;
+import Layout from '@components/layout/Layout';
+
+const EventsPageWithLayout = (props) => (
+  <Layout>
+    <EventsPage {...props} />
+  </Layout>
+);
+
+export default EventsPageWithLayout;

@@ -1,6 +1,5 @@
 import { Suspense } from 'react';
 import AppRoutes from './routes';
-import MainLayout from './components/layout/MainLayout';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import { useAuth } from './hooks/useAuth';
 
@@ -23,9 +22,7 @@ function App() {
         </div>
       }
     >
-      <MainLayout>
-        <AppRoutes />
-      </MainLayout>
+      <AppRoutes />
     </Suspense>
   );
 }

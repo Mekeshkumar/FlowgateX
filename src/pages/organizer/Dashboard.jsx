@@ -110,9 +110,8 @@ const OrganizerDashboard = () => {
                   <td className="py-3 px-4 text-gray-600">{event.tickets}</td>
                   <td className="py-3 px-4 font-medium text-gray-900">{event.revenue}</td>
                   <td className="py-3 px-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      event.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                    }`}>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${event.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                      }`}>
                       {event.status}
                     </span>
                   </td>
@@ -131,4 +130,12 @@ const OrganizerDashboard = () => {
   );
 };
 
-export default OrganizerDashboard;
+import Layout from '@components/layout/Layout';
+
+const OrganizerDashboardWithLayout = (props) => (
+  <Layout>
+    <OrganizerDashboard {...props} />
+  </Layout>
+);
+
+export default OrganizerDashboardWithLayout;

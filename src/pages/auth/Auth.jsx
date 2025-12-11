@@ -120,15 +120,20 @@ const Auth = ({ initialView = 'login' }) => {
         document.documentElement.setAttribute('data-theme', savedTheme);
     }, []);
 
+    // Debounced carousel effect for smoother transitions
     useEffect(() => {
+        let fadeTimeout;
         const interval = setInterval(() => {
             setFadeText(false);
-            setTimeout(() => {
+            fadeTimeout = setTimeout(() => {
                 setCarouselIndex((prev) => (prev + 1) % messages.length);
                 setFadeText(true);
             }, 400);
         }, 5000);
-        return () => clearInterval(interval);
+        return () => {
+            clearInterval(interval);
+            clearTimeout(fadeTimeout);
+        };
     }, [messages.length]);
 
     useEffect(() => {
@@ -250,6 +255,7 @@ const Auth = ({ initialView = 'login' }) => {
     const handleLoginSubmit = useCallback(
         async (e) => {
             e.preventDefault();
+            if (isLoading) return; // Prevent double submit
             setErrors({});
 
             const email = (loginData.identifier || '').trim().toLowerCase();
@@ -447,7 +453,7 @@ const Auth = ({ initialView = 'login' }) => {
                     addToast(response.message || 'Login failed', 'error');
                 }
             } catch (error) {
-                console.error('Login error:', error);
+                // Optionally log error to a monitoring service
                 const errorMessage =
                     error.data?.message || error.message || 'Login failed. Please try again.';
                 addToast(errorMessage, 'error');
@@ -456,12 +462,13 @@ const Auth = ({ initialView = 'login' }) => {
                 setIsLoading(false);
             }
         },
-        [loginData, addToast, navigate, emailRegex, setAuthUser]
+        [loginData, addToast, navigate, emailRegex, setAuthUser, isLoading]
     );
 
     const handleRegisterSubmit = useCallback(
         async (e) => {
             e.preventDefault();
+            if (isLoading) return; // Prevent double submit
 
             // Final validation
             const newErrors = {};
@@ -551,7 +558,7 @@ const Auth = ({ initialView = 'login' }) => {
                     addToast(response.message || 'Registration failed', 'error');
                 }
             } catch (error) {
-                console.error('Registration error:', error);
+                // Optionally log error to a monitoring service
                 const errorMessage =
                     error.data?.message || error.message || 'Registration failed. Please try again.';
 
@@ -566,7 +573,7 @@ const Auth = ({ initialView = 'login' }) => {
                 setIsLoading(false);
             }
         },
-        [registerData, addToast, navigate, emailRegex, phoneRegex, setAuthUser]
+        [registerData, addToast, navigate, emailRegex, phoneRegex, setAuthUser, isLoading]
     );
 
     const handleForgotSendOtp = useCallback(() => {
@@ -620,6 +627,8 @@ const Auth = ({ initialView = 'login' }) => {
                             loop
                             playsInline
                             className="w-full h-full object-cover opacity-50"
+                            preload="none"
+                            poster="/assets/images/auth-bg-poster.jpg"
                         >
                             <source src="src/assets/Video/Authen.mp4" type="video/mp4" />
                         </video>

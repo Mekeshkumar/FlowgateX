@@ -34,7 +34,6 @@ const Header = ({
   showSidebarTrigger = false,
   isSidebarCollapsed = false,
   onSidebarCollapse = () => { },
-  ...props
 }) => {
   // ===========================
   // STATE MANAGEMENT

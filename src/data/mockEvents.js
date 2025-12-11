@@ -317,7 +317,41 @@ export const generateMockEvents = (count = 50) => {
 // EXPORTS
 // ============================================================================
 
-export const mockEvents = generateMockEvents(50);
+let _mockEvents = generateMockEvents(50);
+if (!_mockEvents || !_mockEvents.length) {
+    _mockEvents = [{
+        id: 'evt-debug',
+        title: 'Debug Event',
+        description: 'This is a debug event to ensure rendering works.',
+        image: 'https://via.placeholder.com/800x400?text=Debug+Event',
+        date: new Date().toISOString().split('T')[0],
+        time: '10:00 AM',
+        location: { venue: 'Debug Venue', city: 'Debug City', state: 'Debug State' },
+        category: 'debug',
+        price: 0,
+        originalPrice: null,
+        currency: '₹',
+        capacity: 100,
+        attendees: 0,
+        available: 100,
+        rating: 5,
+        reviews: 0,
+        isFeatured: false,
+        isTrending: false,
+        isOnline: false,
+        tags: ['debug'],
+        organizer: { name: 'Debug Organizer', avatar: 'DO', verified: true },
+        generatedAt: new Date().toISOString(),
+        video: null,
+        venue: { name: 'Debug Venue', address: '123 Debug St', mapUrl: '', amenities: [] },
+        agenda: [],
+        ticketTiers: [],
+        faq: [],
+        reviewsList: [],
+        relatedEvents: []
+    }];
+}
+export const mockEvents = _mockEvents;
 
 // Categories configuration
 export const eventCategories = [

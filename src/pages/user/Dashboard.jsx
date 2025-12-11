@@ -8,10 +8,10 @@ const UserDashboard = () => {
   const { user } = useAuth();
 
   const stats = [
-    { title: 'Upcoming Events', value: '3', icon: 'event', iconBg: 'bg-blue-100', iconColor: 'text-blue-600' },
-    { title: 'Total Bookings', value: '12', icon: 'confirmation_number', iconBg: 'bg-green-100', iconColor: 'text-green-600' },
-    { title: 'Events Attended', value: '8', icon: 'check_circle', iconBg: 'bg-purple-100', iconColor: 'text-purple-600' },
-    { title: 'Saved Events', value: '5', icon: 'favorite', iconBg: 'bg-red-100', iconColor: 'text-red-600' },
+    { title: 'Upcoming Events', value: '3', icon: 'event', iconBg: 'bg-blue-500/20', iconColor: 'text-blue-500' },
+    { title: 'Total Bookings', value: '12', icon: 'confirmation_number', iconBg: 'bg-green-500/20', iconColor: 'text-green-500' },
+    { title: 'Events Attended', value: '8', icon: 'check_circle', iconBg: 'bg-purple-500/20', iconColor: 'text-purple-500' },
+    { title: 'Saved Events', value: '5', icon: 'favorite', iconBg: 'bg-red-500/20', iconColor: 'text-red-500' },
   ];
 
   const upcomingEvents = [
@@ -36,13 +36,13 @@ const UserDashboard = () => {
   ];
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-0 md:p-6 max-w-7xl mx-auto">
       {/* Welcome Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-[var(--text-primary)]">
           Welcome back, {user?.name || 'User'}! 👋
         </h1>
-        <p className="text-gray-500">Here&apos;s what&apos;s happening with your events.</p>
+        <p className="text-[var(--text-muted)]">Here&apos;s what&apos;s happening with your events.</p>
       </div>
 
       {/* Stats Grid */}
@@ -59,7 +59,7 @@ const UserDashboard = () => {
           <Card
             title="Upcoming Events"
             headerAction={
-              <Link to="/events" className="text-primary-600 text-sm font-medium hover:text-primary-700">
+              <Link to="/events" className="text-[var(--brand-primary)] text-sm font-medium hover:text-[var(--brand-primary-hover)]">
                 View All
               </Link>
             }
@@ -82,7 +82,7 @@ const UserDashboard = () => {
                   Browse Events
                 </Button>
               </Link>
-              <Link to="/bookings">
+              <Link to="/my-bookings">
                 <Button variant="outline" className="w-full justify-start gap-3">
                   <span className="material-icons-outlined">confirmation_number</span>
                   My Tickets
@@ -94,7 +94,7 @@ const UserDashboard = () => {
                   Saved Events
                 </Button>
               </Link>
-              <Link to="/profile">
+              <Link to="/dashboard"> {/* Changed from /profile which doesn't exist */}
                 <Button variant="outline" className="w-full justify-start gap-3">
                   <span className="material-icons-outlined">person</span>
                   Edit Profile
@@ -112,12 +112,12 @@ const UserDashboard = () => {
                 { action: 'Attended', event: 'Startup Meetup', time: '3 days ago' },
               ].map((activity, index) => (
                 <div key={index} className="flex items-start gap-3">
-                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2" />
+                  <div className="w-2 h-2 bg-[var(--brand-primary)] rounded-full mt-2" />
                   <div>
-                    <p className="text-sm text-gray-900">
+                    <p className="text-sm text-[var(--text-primary)]">
                       {activity.action}: <span className="font-medium">{activity.event}</span>
                     </p>
-                    <p className="text-xs text-gray-400">{activity.time}</p>
+                    <p className="text-xs text-[var(--text-muted)]">{activity.time}</p>
                   </div>
                 </div>
               ))}
@@ -129,4 +129,13 @@ const UserDashboard = () => {
   );
 };
 
-export default UserDashboard;
+import Layout from '@components/layout/Layout';
+
+const UserDashboardWithLayout = (props) => (
+  <Layout>
+    <UserDashboard {...props} />
+  </Layout>
+);
+
+export default UserDashboardWithLayout;
+

@@ -63,9 +63,8 @@ const AdminDashboard = () => {
               {systemHealth.map((service) => (
                 <div key={service.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center gap-3">
-                    <div className={`w-2 h-2 rounded-full ${
-                      service.status === 'operational' ? 'bg-green-500' : 'bg-yellow-500'
-                    }`} />
+                    <div className={`w-2 h-2 rounded-full ${service.status === 'operational' ? 'bg-green-500' : 'bg-yellow-500'
+                      }`} />
                     <span className="text-gray-700 font-medium">{service.name}</span>
                   </div>
                   <span className="text-sm text-gray-500">{service.uptime}</span>
@@ -140,4 +139,12 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+import Layout from '@components/layout/Layout';
+
+const AdminDashboardWithLayout = (props) => (
+  <Layout>
+    <AdminDashboard {...props} />
+  </Layout>
+);
+
+export default AdminDashboardWithLayout;

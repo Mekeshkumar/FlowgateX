@@ -73,7 +73,7 @@ const sidebarConfig = {
           {
             id: 'saved-events',
             label: 'Saved',
-            path: '/saved-events',
+            path: '/favorites',
             icon: 'favorite_border',
             badge: 'savedCount',
             badgeColor: 'pink',
@@ -81,11 +81,11 @@ const sidebarConfig = {
           {
             id: 'tickets',
             label: 'My Tickets',
-            path: '/tickets',
+            path: '/my-bookings',
             icon: 'receipt_long',
             subItems: [
-              { id: 'active-tickets', label: 'Active', path: '/tickets/active' },
-              { id: 'past-tickets', label: 'History', path: '/tickets/past' },
+              { id: 'active-tickets', label: 'Active', path: '/my-bookings/active' },
+              { id: 'past-tickets', label: 'History', path: '/my-bookings/past' },
             ],
           },
         ],
@@ -172,8 +172,8 @@ const sidebarConfig = {
       },
     ],
     footer: [
-        { id: 'profile', label: 'Profile', path: '/organizer/profile', icon: 'account_circle' },
-        { id: 'help', label: 'Support', path: '/help', icon: 'help_outline' },
+      { id: 'profile', label: 'Profile', path: '/organizer/profile', icon: 'account_circle' },
+      { id: 'help', label: 'Support', path: '/help', icon: 'help_outline' },
     ],
   },
   admin: {
@@ -214,7 +214,7 @@ const sidebarConfig = {
       },
     ],
     footer: [
-        { id: 'profile', label: 'Admin Profile', path: '/admin/profile', icon: 'admin_panel_settings' },
+      { id: 'profile', label: 'Admin Profile', path: '/admin/profile', icon: 'admin_panel_settings' },
     ],
   },
 };
