@@ -1,6 +1,7 @@
 import { lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
+import Layout from '@components/layout/Layout';
 
 // Lazy load pages for code splitting
 const HomePage = lazy(() => import('@pages/public/HomePage'));
@@ -33,78 +34,45 @@ const AppRoutes = () => {
       {/* Booking page at /bookings endpoint */}
       <Route path="/bookings" element={<BookingPage />} />
 
-      {/* User Routes */}
+      {/* Layout for authenticated users */}
       <Route
-        path="/dashboard"
+        path="/*"
         element={
-          <ProtectedRoute>
-            <UserDashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/my-bookings"
-        element={
-          <ProtectedRoute>
-            <BookingsPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/my-events"
-        element={
-          <ProtectedRoute>
-            <UserDashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/favorites"
-        element={
-          <ProtectedRoute>
-            <UserDashboard />
+          <ProtectedRoute roles={["user", "organizer", "admin"]}>
+            <Layout>
+              <Routes>
+                {/* User Routes */}
+                <Route path="dashboard" element={<UserDashboard />} />
+                <Route path="my-bookings" element={<BookingsPage />} />
+                <Route path="my-events" element={<UserDashboard />} />
+                <Route path="favorites" element={<UserDashboard />} />
+
+                {/* Organizer Routes */}
+                <Route path="organizer/dashboard" element={<OrganizerDashboard />} />
+                <Route path="organizer/events" element={<OrganizerDashboard />} />
+                <Route path="organizer/create" element={<OrganizerDashboard />} />
+                <Route path="organizer/analytics" element={<OrganizerDashboard />} />
+                <Route path="organizer/attendees" element={<OrganizerDashboard />} />
+                <Route path="organizer/checkin" element={<OrganizerDashboard />} />
+
+                {/* Admin Routes */}
+                <Route path="admin/dashboard" element={<AdminDashboard />} />
+                <Route path="admin/users" element={<AdminDashboard />} />
+                <Route path="admin/events" element={<AdminDashboard />} />
+                <Route path="admin/reports" element={<AdminDashboard />} />
+                <Route path="admin/iot" element={<AdminDashboard />} />
+                <Route path="admin/crowd" element={<AdminDashboard />} />
+                <Route path="admin/settings" element={<AdminDashboard />} />
+
+                {/* Catch-all for authenticated users */}
+                <Route path="*" element={<Navigate to="dashboard" replace />} />
+              </Routes>
+            </Layout>
           </ProtectedRoute>
         }
       />
 
-      {/* Organizer Routes */}
-      <Route
-        path="/organizer/*"
-        element={
-          <ProtectedRoute roles={['organizer', 'admin']}>
-            <Routes>
-              <Route path="dashboard" element={<OrganizerDashboard />} />
-              <Route path="events" element={<OrganizerDashboard />} />
-              <Route path="create" element={<OrganizerDashboard />} />
-              <Route path="analytics" element={<OrganizerDashboard />} />
-              <Route path="attendees" element={<OrganizerDashboard />} />
-              <Route path="checkin" element={<OrganizerDashboard />} />
-              <Route path="*" element={<Navigate to="dashboard" replace />} />
-            </Routes>
-          </ProtectedRoute>
-        }
-      />
-
-      {/* Admin Routes */}
-      <Route
-        path="/admin/*"
-        element={
-          <ProtectedRoute roles={['admin']}>
-            <Routes>
-              <Route path="dashboard" element={<AdminDashboard />} />
-              <Route path="users" element={<AdminDashboard />} />
-              <Route path="events" element={<AdminDashboard />} />
-              <Route path="reports" element={<AdminDashboard />} />
-              <Route path="iot" element={<AdminDashboard />} />
-              <Route path="crowd" element={<AdminDashboard />} />
-              <Route path="settings" element={<AdminDashboard />} />
-              <Route path="*" element={<Navigate to="dashboard" replace />} />
-            </Routes>
-          </ProtectedRoute>
-        }
-      />
-
-      {/* Catch-all redirect */}
+      {/* Catch-all redirect for unauthenticated users */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

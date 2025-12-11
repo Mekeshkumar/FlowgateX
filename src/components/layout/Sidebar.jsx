@@ -1,922 +1,671 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
-import { useAuth } from '@hooks/useAuth';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
-const Sidebar = ({ isCollapsed = false, onToggle = () => { } }) => {
-  const { user, logout } = useAuth();
-  const location = useLocation();
-  const sidebarRef = useRef(null);
+// ============================================================================
+// CONFIGURATION (Kept separate for cleanliness)
+// ============================================================================
+const sidebarConfig = {
+  guest: {
+    showSearch: false,
+    showQuickActions: false,
+    showStats: false,
+    sections: [
+      {
+        id: 'explore',
+        label: 'Explore',
+        items: [
+          { id: 'events', label: 'Browse Events', path: '/events', icon: 'event' },
+          {
+            id: 'how-it-works',
+            label: 'How It Works',
+            path: '/how-it-works',
+            icon: 'info_outline',
+          },
+          { id: 'pricing', label: 'Pricing Plans', path: '/pricing', icon: 'payments' },
+        ],
+      },
+      {
+        id: 'company',
+        label: 'Company',
+        items: [
+          { id: 'about', label: 'About Us', path: '/about', icon: 'business' },
+          { id: 'contact', label: 'Contact', path: '/contact', icon: 'contact_support' },
+        ],
+      },
+    ],
+    footer: [{ id: 'login', label: 'Sign In', path: '/login', icon: 'login', highlight: true }],
+  },
+  user: {
+    showSearch: true,
+    searchPlaceholder: 'Search events...',
+    showQuickActions: true,
+    showStats: true,
+    sections: [
+      {
+        id: 'overview',
+        label: 'Overview',
+        items: [
+          {
+            id: 'dashboard',
+            label: 'Dashboard',
+            path: '/dashboard',
+            icon: 'dashboard',
+            exactMatch: true,
+          },
+          { id: 'help', label: 'Help Center', path: '/help', icon: 'help_outline' },
+        ],
+      },
+      {
+        id: 'events',
+        label: 'My Events',
+        collapsible: true,
+        defaultOpen: true,
+        items: [
+          { id: 'browse-events', label: 'Browse', path: '/events', icon: 'explore' },
+          {
+            id: 'my-bookings',
+            label: 'Bookings',
+            path: '/my-bookings',
+            icon: 'confirmation_number',
+            badge: 'upcomingBookings',
+            badgeColor: 'blue',
+          },
+          {
+            id: 'saved-events',
+            label: 'Saved',
+            path: '/saved-events',
+            icon: 'favorite_border',
+            badge: 'savedCount',
+            badgeColor: 'pink',
+          },
+          {
+            id: 'tickets',
+            label: 'My Tickets',
+            path: '/tickets',
+            icon: 'receipt_long',
+            subItems: [
+              { id: 'active-tickets', label: 'Active', path: '/tickets/active' },
+              { id: 'past-tickets', label: 'History', path: '/tickets/past' },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'account',
+        label: 'Account',
+        collapsible: true,
+        defaultOpen: false,
+        items: [
+          { id: 'profile', label: 'Profile', path: '/profile', icon: 'person' },
+          {
+            id: 'notifications',
+            label: 'Notifications',
+            path: '/notifications',
+            icon: 'notifications',
+            badge: 'unreadNotifications',
+            badgeColor: 'red',
+          },
+          { id: 'settings', label: 'Settings', path: '/settings', icon: 'settings' },
+        ],
+      },
+    ],
+    quickActions: [
+      {
+        id: 'find-events',
+        label: 'Find Event',
+        action: 'navigate',
+        path: '/events',
+        icon: 'search',
+        variant: 'primary',
+      },
+      {
+        id: 'view-tickets',
+        label: 'My Tickets',
+        action: 'navigate',
+        path: '/my-bookings',
+        icon: 'confirmation_number',
+      },
+    ],
+    footer: [
+      {
+        id: 'become-organizer',
+        label: 'Organizer Mode',
+        path: '/organizer/apply',
+        icon: 'business_center',
+        highlight: true,
+      },
+      { id: 'help', label: 'Support', path: '/help', icon: 'help_outline' },
+    ],
+  },
+  organizer: {
+    showSearch: true,
+    searchPlaceholder: 'Search my events...',
+    showQuickActions: false,
+    showStats: false,
+    sections: [
+      {
+        id: 'management',
+        label: 'Management',
+        items: [
+          { id: 'dashboard', label: 'Dashboard', path: '/organizer/dashboard', icon: 'dashboard' },
+          { id: 'create-event', label: 'Create Event', path: '/organizer/events/create', icon: 'add_circle_outline' },
+          { id: 'my-events', label: 'My Events', path: '/organizer/events', icon: 'event_note' },
+          { id: 'participants', label: 'Participants', path: '/organizer/participants', icon: 'people' },
+        ],
+      },
+      {
+        id: 'monitoring',
+        label: 'Monitoring',
+        items: [
+          { id: 'iot-management', label: 'IoT Management', path: '/organizer/iot', icon: 'memory' },
+          { id: 'crowd-monitoring', label: 'Crowd Monitoring', path: '/organizer/crowd', icon: 'groups' },
+        ],
+      },
+      {
+        id: 'business',
+        label: 'Business',
+        items: [
+          { id: 'analytics', label: 'Analytics', path: '/organizer/analytics', icon: 'analytics' },
+          { id: 'revenue', label: 'Revenue', path: '/organizer/revenue', icon: 'monetization_on' },
+          { id: 'marketing', label: 'Marketing', path: '/organizer/marketing', icon: 'campaign' },
+        ],
+      },
+    ],
+    footer: [
+        { id: 'profile', label: 'Profile', path: '/organizer/profile', icon: 'account_circle' },
+        { id: 'help', label: 'Support', path: '/help', icon: 'help_outline' },
+    ],
+  },
+  admin: {
+    showSearch: true,
+    searchPlaceholder: 'Search users, events...',
+    showQuickActions: false,
+    showStats: false,
+    sections: [
+      {
+        id: 'overview',
+        label: 'Overview',
+        items: [
+          { id: 'dashboard', label: 'Dashboard', path: '/admin/dashboard', icon: 'dashboard' },
+        ],
+      },
+      {
+        id: 'management',
+        label: 'Management',
+        items: [
+          { id: 'users', label: 'Users', path: '/admin/users', icon: 'people_outline' },
+          { id: 'organizers', label: 'Organizers', path: '/admin/organizers', icon: 'business_center' },
+          { id: 'events', label: 'Events', path: '/admin/events', icon: 'event' },
+          { id: 'devices', label: 'Devices', path: '/admin/devices', icon: 'devices' },
+          { id: 'payments', label: 'Payments', path: '/admin/payments', icon: 'payment' },
+        ],
+      },
+      {
+        id: 'platform',
+        label: 'Platform',
+        items: [
+          { id: 'analytics', label: 'Analytics', path: '/admin/analytics', icon: 'analytics' },
+          { id: 'support', label: 'Support', path: '/admin/support', icon: 'support_agent' },
+          { id: 'content', label: 'Content', path: '/admin/content', icon: 'article' },
+          { id: 'settings', label: 'Settings', path: '/admin/settings', icon: 'settings' },
+          { id: 'logs', label: 'Logs', path: '/admin/logs', icon: 'receipt_long' },
+          { id: 'chatbot', label: 'Chatbot', path: '/admin/chatbot', icon: 'smart_toy' },
+        ],
+      },
+    ],
+    footer: [
+        { id: 'profile', label: 'Admin Profile', path: '/admin/profile', icon: 'admin_panel_settings' },
+    ],
+  },
+};
 
-  // ===========================
-  // STATE MANAGEMENT
-  // ===========================
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [activeSubmenu, setActiveSubmenu] = useState(null);
-  const [showQuickStats, setShowQuickStats] = useState(true);
-  const [tooltipContent, setTooltipContent] = useState(null);
-  const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
-  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
-  const [hoveredItem, setHoveredItem] = useState(null);
+// ============================================================================
+// HELPER COMPONENTS
+// ============================================================================
 
-  // ===========================
-  // THEME MANAGEMENT
-  // ===========================
-  const toggleTheme = useCallback(() => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-    document.documentElement.classList.remove('light', 'dark');
-    document.documentElement.classList.add(newTheme);
-    document.documentElement.setAttribute('data-theme', newTheme);
-  }, [theme]);
+const Icon = ({ name, className = '' }) => (
+  <span
+    className={`material-icons-outlined select-none ${className}`}
+    aria-hidden="true"
+    style={{ fontSize: 'inherit' }}
+  >
+    {name}
+  </span>
+);
 
-  // ===========================
-  // KEYBOARD SHORTCUTS
-  // ===========================
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
-        e.preventDefault();
-        onToggle();
-      }
-      if (e.key === 'Escape' && isMobileOpen) {
-        setIsMobileOpen(false);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onToggle, isMobileOpen]);
+const SidebarTooltip = ({ text }) => (
+  <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-3 py-2 bg-[var(--bg-card)] text-[var(--text-primary)] text-xs font-semibold rounded-lg shadow-red-lg border border-[var(--border-primary)] opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-[60] animate-fadeIn">
+    {text}
+    {/* Tooltip Arrow */}
+    <div className="absolute top-1/2 right-full -translate-y-1/2 border-[6px] border-transparent border-r-[var(--border-primary)]" />
+    <div className="absolute top-1/2 right-full -translate-y-1/2 mr-[-1px] border-[5px] border-transparent border-r-[var(--bg-card)]" />
+  </div>
+);
 
-  // ===========================
-  // EVENT LISTENERS
-  // ===========================
-  useEffect(() => {
-    setIsMobileOpen(false);
-  }, [location.pathname]);
+// ============================================================================
+// SEARCH BAR
+// ============================================================================
+const SearchBar = ({ placeholder, isCollapsed, onExpand }) => {
+  const [query, setQuery] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
 
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (isMobileOpen && sidebarRef.current && !sidebarRef.current.contains(e.target)) {
-        setIsMobileOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isMobileOpen]);
-
-  // ===========================
-  // TOOLTIP HANDLERS
-  // ===========================
-  const showTooltip = useCallback((content, e) => {
-    if (!isCollapsed) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    setTooltipContent(content);
-    setTooltipPosition({
-      top: rect.top + rect.height / 2,
-      left: rect.right + 12,
-    });
-  }, [isCollapsed]);
-
-  const hideTooltip = useCallback(() => {
-    setTooltipContent(null);
-  }, []);
-
-  // ===========================
-  // HELPER FUNCTIONS
-  // ===========================
-  const getUserInitials = useMemo(() => {
-    if (!user?.name) return 'U';
-    const names = user.name.split(' ');
-    if (names.length >= 2) {
-      return `${names[0][0]}${names[1][0]}`.toUpperCase();
-    }
-    return names[0].substring(0, 2).toUpperCase();
-  }, [user?.name]);
-
-  const toggleSubmenu = useCallback((menuName) => {
-    setActiveSubmenu(prev => prev === menuName ? null : menuName);
-  }, []);
-
-  const isPathActive = useCallback((href) => {
-    return location.pathname === href || location.pathname.startsWith(href + '/');
-  }, [location.pathname]);
-
-  // ===========================
-  // ROLE-BASED MENU CONFIGURATION
-  // ===========================
-  const menuConfig = useMemo(() => {
-    // Viewer/User Role
-    const userMenu = {
-      label: 'Personal Workspace',
-      primary: [
-        { name: 'Home', href: '/dashboard', icon: 'home', tip: 'Dashboard' },
-        { name: 'Discover', href: '/events', icon: 'explore', badge: 'New', tip: 'Browse' },
-        { name: 'Bookings', href: '/bookings', icon: 'confirmation_number', badge: 3 },
-        { name: 'Favorites', href: '/favorites', icon: 'favorite' },
-        { name: 'Tickets', href: '/tickets', icon: 'local_activity' },
-        { name: 'Messages', href: '/messages', icon: 'chat', badge: 5 },
-        { name: 'Activity', href: '/activity', icon: 'history' },
-      ],
-      quickActions: [
-        { name: 'Find Events', icon: 'search', action: () => { }, color: 'primary' },
-        { name: 'Payments', icon: 'payment', href: '/payments', color: 'secondary' },
-      ],
-      secondary: [
-        { name: 'Settings', href: '/settings', icon: 'settings' },
-        { name: 'Support', href: '/help', icon: 'help_outline' },
-      ],
-    };
-
-    // Editor/Organizer Role
-    const organizerMenu = {
-      label: 'Organizer Console',
-      primary: [
-        { name: 'Dashboard', href: '/organizer/dashboard', icon: 'dashboard' },
-        { name: 'Analytics', href: '/organizer/analytics', icon: 'analytics' },
-        {
-          name: 'Events',
-          icon: 'event',
-          submenu: [
-            { name: 'All Events', href: '/organizer/events', icon: 'list' },
-            { name: 'Create New', href: '/organizer/events/create', icon: 'add' },
-            { name: 'Drafts', href: '/organizer/events/drafts', icon: 'drafts', badge: 2 },
-          ],
-        },
-        {
-          name: 'Attendees',
-          icon: 'groups',
-          submenu: [
-            { name: 'Guest List', href: '/organizer/attendees', icon: 'people' },
-            { name: 'Check-in', href: '/organizer/checkin', icon: 'how_to_reg' },
-          ],
-        },
-        {
-          name: 'Finance',
-          icon: 'account_balance',
-          submenu: [
-            { name: 'Revenue', href: '/organizer/finance/revenue', icon: 'trending_up' },
-            { name: 'Payouts', href: '/organizer/finance/payouts', icon: 'payments' },
-          ],
-        },
-        {
-          name: 'Marketing',
-          icon: 'campaign',
-          submenu: [
-            { name: 'Promotions', href: '/organizer/marketing/promotions', icon: 'local_offer' },
-            { name: 'Email', href: '/organizer/marketing/email', icon: 'email' },
-          ],
-        },
-      ],
-      quickActions: [
-        { name: 'New Event', icon: 'add_circle', href: '/organizer/events/create', color: 'primary', shortcut: 'Ctrl+N' },
-        { name: 'Scan QR', icon: 'qr_code_scanner', href: '/organizer/scanner', color: 'accent' },
-      ],
-      secondary: [
-        { name: 'Settings', href: '/organizer/settings', icon: 'settings' },
-        { name: 'Docs', href: '/help', icon: 'menu_book' },
-      ],
-    };
-
-    // Admin Role
-    const adminMenu = {
-      label: 'Admin Administration',
-      primary: [
-        { name: 'Overview', href: '/admin/dashboard', icon: 'dashboard' },
-        { name: 'Platform Data', href: '/admin/analytics', icon: 'insights' },
-        {
-          name: 'Users',
-          icon: 'manage_accounts',
-          submenu: [
-            { name: 'All Users', href: '/admin/users', icon: 'people' },
-            { name: 'Organizers', href: '/admin/users/organizers', icon: 'person_pin' },
-            { name: 'Blocked', href: '/admin/users/blocked', icon: 'block', badge: 2 },
-          ],
-        },
-        {
-          name: 'Events',
-          icon: 'event_available',
-          submenu: [
-            { name: 'All Events', href: '/admin/events', icon: 'event_note' },
-            { name: 'Approvals', href: '/admin/events/pending', icon: 'pending_actions', badge: 3 },
-          ],
-        },
-        {
-          name: 'Finance',
-          icon: 'payments',
-          submenu: [
-            { name: 'Transactions', href: '/admin/finance/transactions', icon: 'receipt_long' },
-            { name: 'Refunds', href: '/admin/finance/refunds', icon: 'money_off' },
-          ],
-        },
-        {
-          name: 'IoT Hub',
-          icon: 'router',
-          submenu: [
-            { name: 'Devices', href: '/admin/iot/devices', icon: 'router' },
-            { name: 'Logs', href: '/admin/iot/logs', icon: 'description' },
-          ],
-        },
-      ],
-      quickActions: [
-        { name: 'Sys Status', icon: 'monitor_heart', action: () => { }, color: 'success' },
-        { name: 'Export Data', icon: 'download', action: () => { }, color: 'secondary' },
-      ],
-      secondary: [
-        { name: 'Sys Settings', href: '/admin/settings', icon: 'admin_panel_settings' },
-        { name: 'Audit Log', href: '/admin/docs', icon: 'fact_check' },
-      ],
-    };
-
-    switch (user?.role) {
-      case 'admin': return adminMenu;
-      case 'organizer': return organizerMenu;
-      default: return userMenu;
-    }
-  }, [user?.role]);
-
-  // ===========================
-  // MOCK DATA FOR LIVE STATUS
-  // ===========================
-  const liveEventStatus = useMemo(() => ({ live: 3, attention: 2 }), []);
-  const quickStats = useMemo(() => ({ ticketsSold: 234, revenue: 12450, attendance: 89 }), []);
-  const iotDevices = useMemo(() => ([
-    { name: 'Gate 1', status: 'online' },
-    { name: 'Gate 2', status: 'online' },
-    { name: 'Gate 3', status: 'online' },
-    { name: 'Gate 4', status: 'offline' },
-  ]), []);
-  const suggestions = useMemo(() => (['Create weekend event', 'Check pending bookings']), []);
-
-  // ===========================
-  // RENDER HELPERS
-  // ===========================
-  const filteredMenu = useMemo(() => menuConfig.primary, [menuConfig.primary]);
-
-  // ===========================
-  // RENDER MENU ITEM WITH PREMIUM STYLING
-  // ===========================
-  const renderMenuItem = useCallback((item) => {
-    const hasSubmenu = item.submenu && item.submenu.length > 0;
-    const isSubmenuOpen = activeSubmenu === item.name;
-    const isActive = item.href ? isPathActive(item.href) : false;
-    const isSubmenuActive = hasSubmenu && item.submenu.some(sub => isPathActive(sub.href));
-
-    // Premium styling classes
-    const baseItemClass = `
-      relative flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium 
-      transition-all duration-300 ease-out group w-full
-      ${isCollapsed ? 'justify-center' : 'justify-start'}
-    `;
-
-    const activeItemClass = `
-      bg-gradient-to-r from-[var(--brand-primary)]/10 to-[var(--brand-primary)]/5 
-      text-[var(--brand-primary)] shadow-lg shadow-[var(--brand-primary)]/5
-      border-l-4 border-[var(--brand-primary)]
-    `;
-
-    const inactiveItemClass = `
-      text-[var(--text-secondary)] hover:bg-gradient-to-r hover:from-[var(--bg-hover)] 
-      hover:to-transparent hover:text-[var(--text-primary)] 
-      hover:border-l-4 hover:border-[var(--brand-primary)]/30
-      border-l-4 border-transparent
-    `;
-
-    const itemContent = (
-      <>
-        <span
-          className={`material-icons-outlined text-xl shrink-0 transition-all duration-300 
-            ${(isActive || isSubmenuActive)
-              ? 'text-[var(--brand-primary)] scale-110'
-              : 'text-[var(--text-muted)] group-hover:text-[var(--brand-primary)] group-hover:scale-110'
-            }`}
-        >
-          {item.icon}
-        </span>
-
-        {!isCollapsed && (
-          <>
-            <span className="flex-1 text-left truncate font-medium">{item.name}</span>
-
-            {item.badge && (
-              <span
-                className={`px-2.5 py-1 text-[10px] font-bold rounded-full uppercase tracking-wider 
-                  transition-all duration-200 
-                  ${typeof item.badge === 'string'
-                    ? 'bg-gradient-to-r from-[var(--brand-primary)]/20 to-[var(--brand-primary)]/10 text-[var(--brand-primary)]'
-                    : 'bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-primary-dark)] text-white shadow-md shadow-[var(--brand-primary)]/30'
-                  }`}
-              >
-                {item.badge}
-              </span>
-            )}
-
-            {hasSubmenu && (
-              <span
-                className={`material-icons-outlined text-lg transition-all duration-300 
-                  ${isSubmenuOpen ? 'rotate-180 text-[var(--brand-primary)]' : 'text-[var(--text-muted)]'}
-                `}
-              >
-                expand_more
-              </span>
-            )}
-          </>
-        )}
-      </>
-    );
-
-    if (hasSubmenu) {
-      return (
-        <li key={item.name} className="relative mb-2">
+  return (
+    <div className={`relative px-3 mb-4 transition-all duration-300 ${isCollapsed ? 'px-2' : ''}`}>
+      {/* Expanded State */}
+      <div
+        className={`relative transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 pointer-events-none hidden' : 'opacity-100 w-full'}`}
+      >
+        <Icon
+          name="search"
+          className={`absolute left-3 top-1/2 -translate-y-1/2 text-lg transition-colors duration-300 ${isFocused ? 'text-[var(--brand-primary)]' : 'text-[var(--text-muted)]'}`}
+        />
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          placeholder={placeholder}
+          className="w-full pl-10 pr-9 py-2.5 text-sm bg-[var(--bg-tertiary)] border border-[var(--border-primary)] rounded-xl focus:outline-none focus:border-[var(--brand-primary)] focus:shadow-[0_0_0_3px_rgba(235,22,22,0.1)] transition-all text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
+        />
+        {query && (
           <button
-            onClick={() => toggleSubmenu(item.name)}
-            onMouseEnter={(e) => {
-              showTooltip(item.tip || item.name, e);
-              setHoveredItem(item.name);
-            }}
-            onMouseLeave={() => {
-              hideTooltip();
-              setHoveredItem(null);
-            }}
-            className={`${baseItemClass} ${isSubmenuActive ? activeItemClass : inactiveItemClass}`}
-            aria-expanded={isSubmenuOpen}
+            onClick={() => setQuery('')}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--brand-primary)]"
+            aria-label="Clear search"
           >
-            {itemContent}
+            <Icon name="close" className="text-base" />
           </button>
-
-          {/* Submenu - Expanded View */}
-          <div
-            className={`overflow-hidden transition-all duration-500 ease-out 
-              ${!isCollapsed && isSubmenuOpen ? 'max-h-[500px] opacity-100 mt-2' : 'max-h-0 opacity-0'}
-            `}
-          >
-            <ul className="pl-4 space-y-1 border-l-2 border-[var(--brand-primary)]/20 ml-6">
-              {item.submenu.map(subItem => (
-                <li key={subItem.name}>
-                  <NavLink
-                    to={subItem.href}
-                    className={({ isActive }) => `
-                      flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm transition-all duration-200
-                      ${isActive
-                        ? 'text-[var(--brand-primary)] font-semibold bg-gradient-to-r from-[var(--brand-primary)]/10 to-transparent border-l-2 border-[var(--brand-primary)]'
-                        : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] hover:border-l-2 hover:border-[var(--brand-primary)]/50 border-l-2 border-transparent'
-                      }
-                    `}
-                  >
-                    <span className="material-icons-outlined text-base">{subItem.icon}</span>
-                    {!isCollapsed && <span>{subItem.name}</span>}
-                    {subItem.badge && (
-                      <span className="ml-auto w-2 h-2 rounded-full bg-[var(--brand-primary)] animate-pulse"></span>
-                    )}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Submenu - Collapsed Hover Popup */}
-          {isCollapsed && hoveredItem === item.name && (
-            <div
-              className="absolute left-[calc(100%+16px)] top-0 w-56 bg-[var(--bg-card)] 
-                border border-[var(--border-primary)] rounded-xl shadow-2xl z-50 
-                overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-left"
-            >
-              <div className="px-4 py-3 bg-gradient-to-r from-[var(--brand-primary)]/10 to-transparent border-b border-[var(--border-primary)]">
-                <div className="flex items-center gap-2">
-                  <span className="material-icons-outlined text-[var(--brand-primary)] text-lg">{item.icon}</span>
-                  <span className="text-xs font-bold text-[var(--brand-primary)] uppercase tracking-wider">{item.name}</span>
-                </div>
-              </div>
-              {item.submenu.map(subItem => (
-                <NavLink
-                  key={subItem.name}
-                  to={subItem.href}
-                  className={({ isActive }) => `
-                    flex items-center gap-3 px-4 py-3 text-sm transition-all duration-200
-                    ${isActive
-                      ? 'text-[var(--brand-primary)] bg-gradient-to-r from-[var(--brand-primary)]/10 to-transparent font-semibold'
-                      : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]'
-                    }
-                  `}
-                >
-                  <span className="material-icons-outlined text-base">{subItem.icon}</span>
-                  <span>{subItem.name}</span>
-                  {subItem.badge && (
-                    <span className="ml-auto w-2 h-2 rounded-full bg-[var(--brand-primary)]"></span>
-                  )}
-                </NavLink>
-              ))}
-            </div>
-          )}
-        </li>
-      );
-    }
-
-    return (
-      <li key={item.name} className="mb-2">
-        <NavLink
-          to={item.href}
-          onMouseEnter={(e) => {
-            showTooltip(item.tip || item.name, e);
-            setHoveredItem(item.name);
-          }}
-          onMouseLeave={() => {
-            hideTooltip();
-            setHoveredItem(null);
-          }}
-          className={({ isActive }) => `${baseItemClass} ${isActive ? activeItemClass : inactiveItemClass}`}
-        >
-          {itemContent}
-        </NavLink>
-      </li>
-    );
-  }, [isCollapsed, activeSubmenu, isPathActive, showTooltip, hideTooltip, toggleSubmenu, hoveredItem]);
-
-  // ===========================
-  // SIDEBAR CONTENT RENDERER
-  // ===========================
-  const renderSidebarContent = () => (
-    <div className="flex flex-col h-full bg-[var(--bg-card)] text-[var(--text-primary)]">
-
-      {/* HEADER SECTION */}
-      <div className={`
-        h-20 flex items-center border-b border-[var(--border-primary)] shrink-0
-        bg-gradient-to-b from-[var(--bg-secondary)]/50 to-transparent
-        ${isCollapsed ? 'justify-center px-3' : 'justify-between px-5'}
-      `}>
-        <div className="flex items-center gap-3 overflow-hidden">
-          <div className="
-            w-11 h-11 rounded-xl bg-gradient-to-br from-[var(--brand-primary)] 
-            via-[var(--brand-primary-dark)] to-[var(--brand-primary)] 
-            flex items-center justify-center shrink-0 text-white 
-            shadow-xl shadow-[var(--brand-primary)]/30
-            ring-2 ring-[var(--brand-primary)]/20 ring-offset-2 ring-offset-[var(--bg-card)]
-            transition-transform duration-300 hover:scale-110 hover:rotate-3
-          ">
-            <span className="material-icons text-2xl">auto_awesome</span>
-          </div>
-          {!isCollapsed && (
-            <div className="flex flex-col justify-center">
-              <span className="font-black text-xl leading-tight tracking-tight bg-gradient-to-r from-[var(--text-primary)] to-[var(--text-secondary)] bg-clip-text text-transparent">
-                FlowGate<span className="text-[var(--brand-primary)]">X</span>
-              </span>
-              <span className="text-[9px] text-[var(--text-muted)] font-bold uppercase tracking-widest">
-                {menuConfig.label || 'Enterprise'}
-              </span>
-            </div>
-          )}
-        </div>
+        )}
       </div>
 
-      {/* SCROLLABLE NAVIGATION SECTION */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden py-5 px-3" style={{
-        scrollbarWidth: 'thin',
-        scrollbarColor: 'var(--brand-primary) transparent'
-      }}>
+      {/* Collapsed State */}
+      {isCollapsed && (
+        <button
+          onClick={onExpand}
+          className="w-10 h-10 mx-auto flex items-center justify-center rounded-xl hover:bg-[var(--bg-hover)] text-[var(--text-secondary)] hover:text-[var(--brand-primary)] transition-all group relative sidebar-item-glow"
+          aria-label="Search"
+        >
+          <Icon name="search" className="text-xl" />
+          <SidebarTooltip text="Search" />
+        </button>
+      )}
+    </div>
+  );
+};
 
-        {/* LIVE STATUS INDICATOR */}
-        {(user?.role === 'organizer' || user?.role === 'admin') && !isCollapsed && (
-          <div className="mb-5 mx-1 p-4 rounded-xl bg-gradient-to-br from-[var(--bg-secondary)] to-[var(--bg-tertiary)] border border-[var(--border-primary)] shadow-lg">
-            <div className="flex items-center justify-between text-xs font-semibold">
-              <div className="flex items-center gap-2.5 text-[var(--text-primary)]">
-                <div className="relative">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-lg shadow-emerald-500/50 animate-pulse block"></span>
-                  <span className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
-                </div>
-                <span>{liveEventStatus.live} Live Events</span>
-              </div>
-              <div className="h-4 w-[1px] bg-[var(--border-primary)]"></div>
-              <div className="flex items-center gap-2.5 text-amber-400">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-lg shadow-amber-500/30"></span>
-                <span>{liveEventStatus.attention} Alerts</span>
-              </div>
-            </div>
-          </div>
-        )}
+// ============================================================================
+// SIDEBAR ITEM
+// ============================================================================
+const SidebarItem = ({ item, badges, isActive, onItemClick, isCollapsed, onExpand }) => {
+  const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
+  const badgeCount = item.badge ? badges[item.badge] || 0 : 0;
+  const hasSubItems = item.subItems && item.subItems.length > 0;
 
-        {/* MAIN NAVIGATION MENU */}
-        <nav>
-          <ul className="space-y-1">
-            {!isCollapsed && (
-              <li className="px-4 mb-3 mt-2 text-[11px] font-extrabold text-[var(--text-muted)] uppercase tracking-widest">
-                Navigation
-              </li>
-            )}
-            {filteredMenu.map(item => renderMenuItem(item))}
-          </ul>
-        </nav>
+  // Handle initial open state for submenus if parent is active
+  useEffect(() => {
+    if (isActive && hasSubItems) setIsSubMenuOpen(true);
+  }, [isActive, hasSubItems]);
 
-        {/* QUICK ACTIONS GRID */}
-        {menuConfig.quickActions && !isCollapsed && (
-          <div className="mt-7 mb-5">
-            <p className="px-4 mb-4 text-[11px] font-extrabold text-[var(--text-muted)] uppercase tracking-widest">
-              Quick Actions
-            </p>
-            <div className="grid grid-cols-2 gap-3 px-1">
-              {menuConfig.quickActions.map(action => {
-                const ActionElement = action.href ? NavLink : 'button';
-                const actionProps = action.href ? { to: action.href } : { onClick: action.action };
+  const handleItemClick = (e) => {
+    if (isCollapsed && hasSubItems) {
+      e.preventDefault();
+      onExpand();
+      setIsSubMenuOpen(true);
+      return;
+    }
 
-                return (
-                  <ActionElement
-                    key={action.name}
-                    {...actionProps}
-                    className="
-                      flex flex-col items-center justify-center p-4 rounded-xl 
-                      border-2 border-[var(--border-primary)] 
-                      hover:border-[var(--brand-primary)]/50 
-                      bg-gradient-to-br from-[var(--bg-secondary)] to-transparent
-                      hover:from-[var(--brand-primary)]/5 hover:to-[var(--brand-primary)]/10
-                      transition-all duration-300 group
-                      hover:shadow-lg hover:shadow-[var(--brand-primary)]/10
-                      hover:-translate-y-1
-                    "
-                  >
-                    <span className={`
-                      material-icons-outlined text-2xl mb-2 
-                      group-hover:scale-125 transition-all duration-300
-                      ${action.color === 'primary' ? 'text-[var(--brand-primary)]' :
-                        action.color === 'accent' ? 'text-amber-500' :
-                          action.color === 'success' ? 'text-emerald-500' :
-                            'text-[var(--text-secondary)]'}
-                    `}>
-                      {action.icon}
-                    </span>
-                    <span className="text-[11px] font-bold text-[var(--text-muted)] group-hover:text-[var(--text-primary)] text-center transition-colors">
-                      {action.name}
-                    </span>
-                    {action.shortcut && (
-                      <span className="text-[9px] text-[var(--text-muted)] mt-1 opacity-50">
-                        {action.shortcut}
-                      </span>
-                    )}
-                  </ActionElement>
-                );
-              })}
-            </div>
-          </div>
-        )}
+    if (hasSubItems) {
+      setIsSubMenuOpen(!isSubMenuOpen);
+    } else {
+      onItemClick?.();
+    }
+  };
 
-        {/* AI INSIGHTS CARD */}
-        {!isCollapsed && suggestions.length > 0 && (
-          <div className="
-            mt-5 mx-1 p-4 rounded-xl 
-            bg-gradient-to-br from-[var(--brand-primary)]/10 via-[var(--brand-primary)]/5 to-transparent 
-            border border-[var(--brand-primary)]/30
-            shadow-lg shadow-[var(--brand-primary)]/5
-          ">
-            <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[var(--brand-primary)] to-[var(--brand-primary-dark)] flex items-center justify-center shadow-md">
-                <span className="material-icons-outlined text-sm text-white">auto_awesome</span>
-              </div>
-              <span className="text-xs font-extrabold text-[var(--brand-primary)] uppercase tracking-widest">
-                AI Insights
-              </span>
-            </div>
-            <ul className="space-y-2.5">
-              {suggestions.map((suggestion, index) => (
-                <li
-                  key={index}
-                  className="
-                    flex items-start gap-3 text-xs text-[var(--text-secondary)] 
-                    hover:text-[var(--text-primary)] cursor-pointer 
-                    transition-all duration-200 group p-2 rounded-lg
-                    hover:bg-[var(--bg-hover)]
-                  "
-                >
-                  <span className="
-                    mt-1 w-2 h-2 rounded-full 
-                    bg-[var(--brand-primary)]/50 
-                    group-hover:bg-[var(--brand-primary)] 
-                    shrink-0 transition-all duration-200
-                    group-hover:scale-125
-                  "></span>
-                  <span className="flex-1">{suggestion}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+  const getBadgeStyle = (color) => {
+    const styles = {
+      red: 'bg-red-500/10 text-red-500',
+      blue: 'bg-blue-500/10 text-blue-500',
+      green: 'bg-green-500/10 text-green-500',
+      pink: 'bg-pink-500/10 text-pink-500',
+      orange: 'bg-orange-500/10 text-orange-500',
+    };
+    return styles[color] || 'bg-gray-500/10 text-gray-500';
+  };
 
-        {/* PLATFORM HEALTH SECTION */}
-        {!isCollapsed && (user?.role === 'organizer' || user?.role === 'admin') && (
-          <div className="mt-7 border-t border-[var(--border-primary)] pt-5 px-1">
-            <button
-              onClick={() => setShowQuickStats(!showQuickStats)}
-              className="
-                w-full flex items-center justify-between px-3 py-2 
-                text-[11px] font-extrabold text-[var(--text-muted)] uppercase tracking-widest 
-                hover:text-[var(--text-primary)] transition-colors rounded-lg
-                hover:bg-[var(--bg-hover)]
-              "
-            >
-              <span>Platform Health</span>
-              <span className={`material-icons text-base transition-transform duration-300 ${showQuickStats ? 'rotate-180' : ''}`}>
-                expand_more
-              </span>
-            </button>
-
-            <div className={`
-              transition-all duration-500 overflow-hidden 
-              ${showQuickStats ? 'max-h-[400px] opacity-100 mt-4' : 'max-h-0 opacity-0'}
-            `}>
-              {/* Stats Grid */}
-              <div className="grid grid-cols-3 gap-3 mb-4">
-                {[
-                  { label: 'Tickets', value: quickStats.ticketsSold, color: 'text-blue-400' },
-                  { label: 'Revenue', value: `$${(quickStats.revenue / 1000).toFixed(1)}k`, color: 'text-emerald-400' },
-                  { label: 'Attend', value: `${quickStats.attendance}%`, color: 'text-[var(--brand-primary)]' }
-                ].map((stat, idx) => (
-                  <div
-                    key={idx}
-                    className="
-                      text-center p-3 rounded-xl 
-                      bg-gradient-to-br from-[var(--bg-secondary)] to-[var(--bg-tertiary)]
-                      border border-[var(--border-primary)]
-                      hover:border-[var(--brand-primary)]/30
-                      transition-all duration-200
-                      hover:scale-105
-                    "
-                  >
-                    <div className="text-[10px] text-[var(--text-muted)] mb-1 font-semibold uppercase tracking-wider">
-                      {stat.label}
-                    </div>
-                    <div className={`text-sm font-bold ${stat.color}`}>
-                      {stat.value}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* IoT Devices List */}
-              <div className="space-y-2">
-                <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider px-2 mb-2">
-                  IoT Devices
-                </p>
-                {iotDevices.slice(0, 3).map(device => (
-                  <div
-                    key={device.name}
-                    className="
-                      flex items-center justify-between text-xs px-3 py-2.5 rounded-lg 
-                      bg-[var(--bg-secondary)]/50 hover:bg-[var(--bg-hover)] 
-                      transition-all duration-200 group
-                      border border-transparent hover:border-[var(--border-primary)]
-                    "
-                  >
-                    <span className="text-[var(--text-secondary)] font-medium">{device.name}</span>
-                    <div className="flex items-center gap-2">
-                      <span className={`
-                        w-2 h-2 rounded-full transition-all duration-200
-                        ${device.status === 'online'
-                          ? 'bg-emerald-500 shadow-lg shadow-emerald-500/50'
-                          : 'bg-red-500 shadow-lg shadow-red-500/50'
-                        }
-                      `}></span>
-                      <span className={`
-                        uppercase text-[10px] font-bold tracking-wider
-                        ${device.status === 'online' ? 'text-emerald-400' : 'text-red-400'}
-                      `}>
-                        {device.status}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* SECONDARY MENU */}
-        <div className="mt-6 pt-5 border-t border-[var(--border-primary)]">
-          <ul className="space-y-1">
-            {menuConfig.secondary.map(item => (
-              <li key={item.name}>
-                <NavLink
-                  to={item.href}
-                  className={({ isActive }) => `
-                    flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
-                    transition-all duration-200 group
+  return (
+    <li className="relative mb-1">
+      <div
+        role="button"
+        tabIndex={0}
+        aria-expanded={hasSubItems ? isSubMenuOpen : undefined}
+        onClick={handleItemClick}
+        className={`
+                    sidebar-item group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer select-none transition-all duration-200
+                    ${isCollapsed ? 'justify-center px-0 w-10 mx-auto' : ''}
                     ${isActive
-                      ? 'text-[var(--brand-primary)] bg-gradient-to-r from-[var(--brand-primary)]/10 to-transparent'
-                      : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
-                    }
-                    ${isCollapsed ? 'justify-center' : ''}
-                  `}
+            ? 'sidebar-active active-gradient text-[var(--brand-primary)] font-medium'
+            : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]'
+          }
+                    ${item.highlight ? 'bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-primary-dark)] text-white shadow-red-sm !border-0' : ''}
+                `}
+      >
+        {/* Icon */}
+        <div
+          className={`relative z-10 flex items-center justify-center w-6 h-6 transition-transform duration-200 ${!isCollapsed && 'group-hover:scale-110'} ${isActive && 'scale-110'}`}
+        >
+          <Icon name={item.icon} className="text-xl sidebar-icon" />
+
+          {/* Collapsed Dot Badge */}
+          {isCollapsed && badgeCount > 0 && (
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[var(--brand-primary)] border-2 border-[var(--bg-card)] animate-pulse" />
+          )}
+        </div>
+
+        {/* Label & Details */}
+        <div
+          className={`flex-1 flex items-center justify-between overflow-hidden transition-all duration-300 ${isCollapsed ? 'w-0 opacity-0 ml-0' : 'w-auto opacity-100 ml-1'}`}
+        >
+          <span className="truncate text-sm tracking-wide">{item.label}</span>
+
+          <div className="flex items-center gap-2">
+            {badgeCount > 0 && (
+              <span
+                className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${getBadgeStyle(item.badgeColor)}`}
+              >
+                {badgeCount > 99 ? '99+' : badgeCount}
+              </span>
+            )}
+            {hasSubItems && (
+              <Icon
+                name="expand_more"
+                className={`text-lg transition-transform duration-200 text-[var(--text-muted)] ${isSubMenuOpen ? 'rotate-180' : ''}`}
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Tooltip for Collapsed Mode */}
+        {isCollapsed && <SidebarTooltip text={item.label} />}
+      </div>
+
+      {/* Submenu */}
+      {hasSubItems && (
+        <div
+          className={`overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out ${isSubMenuOpen && !isCollapsed ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0'}`}
+        >
+          <ul className="mt-1 ml-5 pl-3 border-l border-[var(--border-primary)] space-y-1">
+            {item.subItems.map((subItem) => (
+              <li key={subItem.id}>
+                <Link
+                  to={subItem.path}
+                  onClick={onItemClick}
+                  className="block px-3 py-2 text-sm rounded-lg text-[var(--text-muted)] hover:text-[var(--brand-primary)] hover:bg-[var(--bg-hover)] transition-all relative group/sub"
                 >
-                  <span className="material-icons-outlined text-[19px] group-hover:scale-110 transition-transform duration-200">
-                    {item.icon}
+                  <span className="flex items-center gap-2">
+                    <span className="w-1 h-1 rounded-full bg-current opacity-50 transition-all group-hover/sub:w-2 group-hover/sub:bg-[var(--brand-primary)]" />
+                    {subItem.label}
                   </span>
-                  {!isCollapsed && <span>{item.name}</span>}
-                </NavLink>
+                </Link>
               </li>
             ))}
           </ul>
         </div>
+      )}
+    </li>
+  );
+};
+
+// ============================================================================
+// STATS WIDGET
+// ============================================================================
+const StatsWidget = ({ badges, isCollapsed }) => {
+  if (isCollapsed) return null;
+
+  return (
+    <div className="mx-3 mb-4 p-3 bg-[var(--bg-secondary)] rounded-xl border border-[var(--border-primary)] relative overflow-hidden">
+      {/* Background Glow */}
+      <div className="absolute top-0 right-0 w-24 h-24 bg-[var(--brand-primary)] opacity-5 blur-2xl rounded-full pointer-events-none" />
+
+      <div className="flex items-center gap-2 mb-3">
+        <Icon name="insights" className="text-[var(--brand-primary)] text-sm" />
+        <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest">
+          Activity
+        </span>
       </div>
 
-      {/* FOOTER / USER PROFILE SECTION */}
-      <div className="
-        p-5 border-t border-[var(--border-primary)] 
-        bg-gradient-to-t from-[var(--bg-secondary)]/80 to-transparent shrink-0
-      ">
-        {/* User Profile Card */}
-        <div className={`flex items-center mb-4 ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
-          <div className="relative shrink-0 group cursor-pointer">
-            <div className="
-              w-11 h-11 rounded-xl 
-              bg-gradient-to-br from-[var(--brand-primary)] via-[var(--brand-primary-dark)] to-[var(--brand-primary)] 
-              p-[2px] shadow-xl shadow-[var(--brand-primary)]/25
-              transition-all duration-300 group-hover:scale-110 group-hover:rotate-3
-            ">
-              <div className="w-full h-full rounded-[10px] bg-[var(--bg-card)] flex items-center justify-center overflow-hidden">
-                {user?.avatar ? (
-                  <img src={user.avatar} alt="User" className="w-full h-full object-cover" />
-                ) : (
-                  <span className="text-sm font-black text-[var(--brand-primary)]">{getUserInitials}</span>
-                )}
-              </div>
-            </div>
-            <span className="
-              absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 
-              bg-emerald-500 border-[3px] border-[var(--bg-card)] rounded-full 
-              shadow-lg shadow-emerald-500/30
-            "></span>
-          </div>
-
-          {!isCollapsed && (
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <p className="text-sm font-bold text-[var(--text-primary)] truncate">
-                  {user?.name || 'User'}
-                </p>
-                <span className={`
-                  text-[8px] px-2 py-1 rounded-md uppercase tracking-wider font-extrabold
-                  ${user?.role === 'admin' ? 'bg-red-500/15 text-red-400 border border-red-500/30' :
-                    user?.role === 'organizer' ? 'bg-purple-500/15 text-purple-400 border border-purple-500/30' :
-                      'bg-blue-500/15 text-blue-400 border border-blue-500/30'
-                  }
-                `}>
-                  {user?.role || 'Viewer'}
-                </span>
-              </div>
-              <p className="text-[11px] text-[var(--text-muted)] truncate font-medium">
-                {user?.email || 'user@flowgate.com'}
-              </p>
-            </div>
-          )}
+      <div className="grid grid-cols-2 gap-2">
+        <div className="bg-[var(--bg-card)] p-2 rounded-lg border border-[var(--border-primary)] hover:border-[var(--brand-primary)]/30 transition-colors group">
+          <p className="text-xl font-bold text-[var(--text-primary)] group-hover:text-[var(--brand-primary)] transition-colors">
+            {badges.upcomingBookings || 0}
+          </p>
+          <p className="text-[10px] text-[var(--text-muted)]">Bookings</p>
         </div>
-
-        {/* Action Buttons */}
-        <div className={`
-          flex items-center gap-2 
-          ${isCollapsed ? 'flex-col' : 'justify-center bg-[var(--bg-secondary)]/50 rounded-xl p-1.5 border border-[var(--border-primary)]'}
-        `}>
-          <button
-            onClick={toggleTheme}
-            className="
-              p-2.5 rounded-lg text-[var(--text-secondary)] 
-              hover:bg-[var(--bg-hover)] hover:text-[var(--brand-primary)] 
-              transition-all duration-200 group
-              hover:scale-110
-            "
-            title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
-          >
-            <span className="material-icons-outlined text-lg transition-transform duration-500 group-hover:rotate-180">
-              {theme === 'dark' ? 'light_mode' : 'dark_mode'}
-            </span>
-          </button>
-
-          <button
-            onClick={logout}
-            className="
-              p-2.5 rounded-lg text-[var(--text-secondary)] 
-              hover:bg-red-500/10 hover:text-red-500 
-              transition-all duration-200 group
-              hover:scale-110
-            "
-            title="Logout"
-          >
-            <span className="material-icons-outlined text-lg group-hover:translate-x-0.5 transition-transform">
-              logout
-            </span>
-          </button>
-
-          <button
-            onClick={onToggle}
-            className="
-              p-2.5 rounded-lg text-[var(--text-secondary)] 
-              hover:bg-[var(--bg-hover)] hover:text-[var(--brand-primary)] 
-              transition-all duration-200 
-              hidden lg:flex items-center justify-center group
-              hover:scale-110
-            "
-            title={isCollapsed ? "Expand Sidebar (Ctrl+B)" : "Collapse Sidebar (Ctrl+B)"}
-          >
-            <span className="material-icons-outlined text-lg transition-all duration-300 group-hover:scale-125">
-              {isCollapsed ? 'chevron_right' : 'chevron_left'}
-            </span>
-          </button>
+        <div className="bg-[var(--bg-card)] p-2 rounded-lg border border-[var(--border-primary)] hover:border-[var(--brand-primary)]/30 transition-colors group">
+          <p className="text-xl font-bold text-[var(--text-primary)] group-hover:text-[var(--brand-primary)] transition-colors">
+            {badges.savedCount || 0}
+          </p>
+          <p className="text-[10px] text-[var(--text-muted)]">Saved</p>
         </div>
       </div>
     </div>
   );
+};
+
+// ============================================================================
+// MAIN SIDEBAR COMPONENT
+// ============================================================================
+const Sidebar = ({ isOpen, onClose, userRole = 'user', isCollapsed = false, onToggleCollapse }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Memoize config to prevent recalculations
+  const config = useMemo(() => sidebarConfig[userRole] || sidebarConfig.guest, [userRole]);
+
+  // Mock Badges State (In real app, fetch from context/store)
+  const badges = {
+    upcomingBookings: 3,
+    savedCount: 12,
+    unreadNotifications: 5,
+    activeEvents: 2,
+  };
+
+  const isActivePath = (itemPath, exactMatch = false) => {
+    if (exactMatch) return location.pathname === itemPath;
+    return location.pathname.startsWith(itemPath);
+  };
+
+  const handleAction = (item) => {
+    if (item.action === 'navigate') {
+      navigate(item.path);
+      onClose?.();
+    } else if (item.path) {
+      navigate(item.path);
+      onClose?.();
+    }
+  };
 
   return (
     <>
-      {/* DESKTOP SIDEBAR */}
+      {/* Mobile Overlay (Backdrop) */}
+      <div
+        className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      {/* Sidebar Container */}
       <aside
-        ref={sidebarRef}
         className={`
-          fixed top-0 left-0 h-screen z-40
-          bg-[var(--bg-card)] 
-          border-r border-[var(--border-primary)]
-          hidden lg:block 
-          shadow-2xl
-          transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]
-          ${isCollapsed ? 'w-[80px]' : 'w-[300px]'}
-        `}
-        role="navigation"
-        aria-label="Main navigation"
+                    fixed inset-y-0 left-0 z-40 flex flex-col
+                    bg-[var(--bg-card)] border-r border-[var(--border-primary)] 
+                    transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]
+                    glass-effect
+                    ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+                    ${isCollapsed ? 'lg:w-[4.5rem]' : 'lg:w-64'}
+                `}
+        style={{ top: '0', height: '100vh' }} // Assuming full height, adjust if Navbar exists
       >
-        {renderSidebarContent()}
-      </aside>
-
-      {/* MOBILE FAB BUTTON */}
-      <button
-        onClick={() => setIsMobileOpen(true)}
-        className="
-          lg:hidden fixed left-5 bottom-5 
-          w-14 h-14 
-          bg-gradient-to-br from-[var(--brand-primary)] to-[var(--brand-primary-dark)]
-          text-white rounded-2xl 
-          shadow-2xl shadow-[var(--brand-primary)]/40
-          flex items-center justify-center 
-          z-40 
-          active:scale-90 transition-all duration-300
-          hover:shadow-[var(--brand-primary)]/60 hover:scale-110
-          ring-4 ring-[var(--brand-primary)]/10
-        "
-        aria-label="Open navigation menu"
-      >
-        <span className="material-icons text-2xl">menu</span>
-      </button>
-
-      {/* MOBILE DRAWER */}
-      {isMobileOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/70 backdrop-blur-md transition-opacity duration-300 animate-in fade-in"
-            onClick={() => setIsMobileOpen(false)}
-          />
-
-          {/* Drawer Panel */}
-          <div className="absolute inset-y-0 left-0 w-[300px] shadow-2xl transform transition-transform duration-500 ease-out translate-x-0 animate-in slide-in-from-left">
-            {renderSidebarContent()}
-
-            {/* Close Button */}
-            <button
-              onClick={() => setIsMobileOpen(false)}
-              className="
-                absolute top-5 right-5 
-                p-2 rounded-xl 
-                bg-[var(--bg-hover)] text-[var(--text-muted)]
-                hover:bg-red-500/10 hover:text-red-500
-                transition-all duration-200
-                hover:scale-110 hover:rotate-90
-              "
-              aria-label="Close menu"
-            >
-              <span className="material-icons text-xl">close</span>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* TOOLTIP */}
-      {tooltipContent && (
+        {/* 1. Header / Logo Area */}
         <div
-          className="
-            fixed z-[100] 
-            px-4 py-2 
-            bg-[var(--bg-inverse)] text-[var(--text-inverse)] 
-            text-xs font-semibold rounded-lg 
-            shadow-2xl 
-            pointer-events-none whitespace-nowrap 
-            animate-in fade-in zoom-in-95 duration-150
-            border border-[var(--brand-primary)]/20
-          "
-          style={{
-            top: tooltipPosition.top,
-            left: tooltipPosition.left,
-            transform: 'translateY(-50%)',
-          }}
+          className={`h-16 flex items-center border-b border-[var(--border-primary)] bg-[var(--bg-card)]/50 shrink-0 px-4 ${isCollapsed ? 'justify-center' : 'justify-between'}`}
         >
-          {tooltipContent}
           <div
-            className="absolute left-0 top-1/2 -translate-x-1 -translate-y-1/2 w-2 h-2 bg-[var(--bg-inverse)] rotate-45 border-l border-b border-[var(--brand-primary)]/20"
-          ></div>
+            className={`flex items-center gap-2 font-heading font-bold text-xl tracking-tight text-gradient-primary overflow-hidden whitespace-nowrap transition-all duration-300 ${isCollapsed ? 'w-0 opacity-0 hidden' : 'w-auto opacity-100'}`}
+          >
+            <Icon name="auto_awesome" className="text-[var(--brand-primary)]" />
+            <span>FlowGateX</span>
+          </div>
+
+          {/* Collapsed Logo Icon */}
+          {isCollapsed && (
+            <Icon
+              name="auto_awesome"
+              className="text-2xl text-[var(--brand-primary)] animate-pulse-dot"
+            />
+          )}
+
+          {/* Mobile Close Button */}
+          <button
+            onClick={onClose}
+            className="lg:hidden p-2 rounded-lg text-[var(--text-muted)] hover:text-[var(--brand-primary)] hover:bg-[var(--bg-hover)]"
+          >
+            <Icon name="close" />
+          </button>
         </div>
-      )}
+
+        {/* Desktop Collapse Toggle (Floating Bubble) */}
+        <div className="hidden lg:block absolute -right-3 top-[4.5rem] z-50">
+          <button
+            onClick={onToggleCollapse}
+            className="flex items-center justify-center w-6 h-6 rounded-full bg-[var(--bg-card)] border border-[var(--border-primary)] text-[var(--text-muted)] hover:text-[var(--brand-primary)] shadow-red-sm transition-all hover:scale-110 focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+            title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
+          >
+            <Icon name={isCollapsed ? 'chevron_right' : 'chevron_left'} className="text-sm" />
+          </button>
+        </div>
+
+        {/* 2. Scrollable Content Area */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden sidebar-scroll custom-scrollbar py-4">
+          {/* Search Section */}
+          {config.showSearch && (
+            <SearchBar
+              placeholder={config.searchPlaceholder}
+              isCollapsed={isCollapsed}
+              onExpand={onToggleCollapse}
+            />
+          )}
+
+          {/* Stats Section */}
+          {config.showStats && <StatsWidget badges={badges} isCollapsed={isCollapsed} />}
+
+          {/* Navigation Sections */}
+          <div className="space-y-6">
+            {config.sections.map((section) => (
+              <div key={section.id}>
+                {/* Section Header */}
+                <div
+                  className={`px-4 mb-2 flex items-center ${isCollapsed ? 'justify-center' : ''}`}
+                >
+                  <span
+                    className={`text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest whitespace-nowrap transition-all ${isCollapsed ? 'hidden' : 'block'}`}
+                  >
+                    {section.label}
+                  </span>
+                  {isCollapsed && (
+                    <div className="w-4 h-0.5 bg-[var(--border-primary)] rounded-full" />
+                  )}
+                </div>
+
+                {/* Items */}
+                <ul className="space-y-0.5">
+                  {section.items.map((item) => (
+                    <SidebarItem
+                      key={item.id}
+                      item={item}
+                      badges={badges}
+                      isActive={isActivePath(item.path, item.exactMatch)}
+                      onItemClick={onClose}
+                      isCollapsed={isCollapsed}
+                      onExpand={onToggleCollapse}
+                    />
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          {/* Quick Actions */}
+          {config.showQuickActions && config.quickActions && (
+            <div className="mt-6 pt-4 border-t border-[var(--border-primary)] mx-3">
+              {!isCollapsed && (
+                <p className="px-1 mb-2 text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest flex items-center gap-2">
+                  <Icon name="bolt" className="text-[var(--brand-primary)] text-xs" /> Quick Actions
+                </p>
+              )}
+              <div className={`grid gap-2 ${isCollapsed ? 'grid-cols-1' : 'grid-cols-1'}`}>
+                {config.quickActions.map((action) => (
+                  <button
+                    key={action.id}
+                    onClick={() => handleAction(action)}
+                    className={`
+                                            flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative
+                                            ${action.variant === 'primary'
+                        ? 'bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-primary-dark)] text-white shadow-md hover:shadow-red-md hover:-translate-y-0.5'
+                        : 'hover:bg-[var(--bg-hover)] text-[var(--text-secondary)] border border-transparent hover:border-[var(--border-primary)]'
+                      }
+                                            ${isCollapsed ? 'justify-center px-0 w-10 mx-auto' : ''}
+                                        `}
+                  >
+                    <Icon
+                      name={action.icon}
+                      className={`text-lg ${isCollapsed ? '' : 'opacity-80'}`}
+                    />
+
+                    {!isCollapsed && <span className="text-sm font-medium">{action.label}</span>}
+
+                    {isCollapsed && <SidebarTooltip text={action.label} />}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 3. Footer / Profile Area */}
+        <div className="p-3 border-t border-[var(--border-primary)] bg-[var(--bg-secondary)]/30 backdrop-blur-md">
+          <ul className="space-y-1">
+            {config.footer.map((item) => (
+              <li key={item.id}>
+                <button
+                  onClick={() => handleAction(item)}
+                  className={`
+                                        w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative
+                                        ${item.highlight
+                      ? 'bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/20'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
+                    }
+                                        ${isCollapsed ? 'justify-center px-0' : ''}
+                                    `}
+                >
+                  <Icon
+                    name={item.icon}
+                    className={`text-xl transition-transform duration-300 ${!isCollapsed && 'group-hover:rotate-12'}`}
+                  />
+
+                  <span
+                    className={`font-medium text-sm overflow-hidden whitespace-nowrap transition-all duration-300 ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}
+                  >
+                    {item.label}
+                  </span>
+
+                  {isCollapsed && <SidebarTooltip text={item.label} />}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </aside>
     </>
   );
 };

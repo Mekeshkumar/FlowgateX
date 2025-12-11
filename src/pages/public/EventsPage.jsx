@@ -49,10 +49,9 @@ const EventsPage = () => {
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       result = result.filter(e =>
-        e.title?.toLowerCase().includes(q) ||
+        (e.title && e.title.toLowerCase().includes(q)) ||
         (e.description && e.description.toLowerCase().includes(q)) ||
-        (Array.isArray(e.tags) && e.tags.some(t => t.toLowerCase().includes(q))) ||
-        e.city?.toLowerCase().includes(q)
+        (e.tags && Array.isArray(e.tags) && e.tags.some(t => typeof t === 'string' && t.toLowerCase().includes(q)))
       );
     }
 

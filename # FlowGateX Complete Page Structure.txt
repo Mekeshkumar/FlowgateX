@@ -1,0 +1,591 @@
+# FlowGateX: Complete Page Structure & Navigation Guide
+
+Based on the multi-role event management platform architecture, here's a comprehensive breakdown of all pages (tabs) organized by user role and functionality.[1][2][3]
+
+***
+
+## **1. Public Pages** (Unauthenticated Users)
+
+### **1.1 Landing Page** (`/`)
+**Purpose:** First impression, marketing, and conversion
+- Hero section with value proposition and CTA
+- Featured upcoming events carousel
+- Platform benefits (IoT access, real-time booking, AI support)
+- How it works section (3-step process)
+- Event categories grid
+- Testimonials from organizers and attendees
+- Footer with links, social media, contact info
+
+### **1.2 Login Page** (`/login`)
+**Purpose:** User authentication entry point
+- Email/phone and password fields
+- "Remember me" checkbox
+- Social login options (Google, Facebook)
+- Forgot password link
+- Link to registration page
+- Role selector (User/Organizer/Admin)
+- Two-factor authentication support
+
+### **1.3 Register Page** (`/register`)
+**Purpose:** New user account creation
+- Registration form (name, email, phone, password)
+- User type selection (Attendee vs Organizer)
+- Terms & conditions acceptance
+- Email verification flow
+- Profile photo upload (optional)
+- Organizer verification workflow (for organizers)
+- Success confirmation with email verification prompt
+
+### **1.4 Forgot Password Page** (`/forgot-password`)
+**Purpose:** Password recovery
+- Email/phone input field
+- OTP/link delivery method selection
+- OTP verification form
+- New password creation
+- Success confirmation with redirect to login
+
+### **1.5 Event Discovery Page** (`/events`)
+**Purpose:** Browse events without login (limited view)
+- Event grid/list toggle view
+- Search bar with autocomplete
+- Filter sidebar (category, date, location, price range)
+- Sort options (popularity, date, price)
+- Map view for location-based discovery
+- Event cards with preview information
+- Pagination or infinite scroll
+- Call-to-action prompting login for booking
+
+***
+
+## **2. User/Attendee Pages** (Role: User)
+
+### **2.1 User Dashboard** (`/dashboard`)
+**Purpose:** Personalized home after login
+- Quick stats (upcoming events, total bookings, saved events)
+- Recommended events based on history
+- Upcoming bookings timeline
+- Recent activity feed
+- Quick actions (browse events, view tickets, update profile)
+- Notifications panel
+- AI chatbot widget (persistent)
+
+### **2.2 Events Catalog** (`/events`)
+**Purpose:** Full event browsing with authentication
+- Advanced search with filters (location radius, capacity, price)
+- Category tabs (concerts, conferences, sports, festivals, workshops)
+- Event cards with real-time availability status
+- "Save to favorites" functionality
+- Sold-out indicators
+- Real-time capacity indicators (seats remaining)
+- Calendar view option
+- Share event functionality
+
+### **2.3 Event Detail Page** (`/events/:eventId`)
+**Purpose:** Comprehensive event information
+- Event banner image/video
+- Event title, date, time, location with map
+- Organizer information with profile link
+- Detailed description and agenda
+- Ticket tiers with pricing (Early Bird, VIP, General)
+- Real-time availability countdown
+- Venue capacity and current bookings
+- Amenities and facilities info
+- FAQ section
+- Reviews and ratings from past attendees
+- Related events recommendations
+- "Book Now" prominent CTA
+- Social sharing buttons
+
+### **2.4 Booking Page** (`/booking/:eventId`)
+**Purpose:** Ticket purchase flow
+- Event summary card (sticky)
+- Ticket quantity selector
+- Add-ons selection (parking, merchandise, food vouchers)
+- Attendee information form (per ticket)
+- Pricing breakdown (base price, taxes, fees)
+- Promotional code input
+- Payment method selection
+- Terms acceptance
+- Booking confirmation preview
+- Secure checkout button
+
+### **2.5 Payment Page** (`/payment/:bookingId`)
+**Purpose:** Payment processing
+- Payment gateway integration (Razorpay, Cashfree, UPI)
+- Saved payment methods
+- Card/UPI/Wallet options
+- Payment security badges
+- Order summary
+- Processing status indicators
+- Payment success/failure handling
+- Redirect to ticket view on success
+
+### **2.6 My Bookings** (`/my-bookings`)
+**Purpose:** Booking history and ticket management
+- Tabs: Upcoming / Past / Cancelled
+- Booking cards with event thumbnail
+- QR code quick access
+- Booking details (order ID, date, amount, status)
+- Download ticket button (PDF)
+- Cancel/Modify booking options (if allowed)
+- Transfer ticket functionality
+- Add to calendar button
+- Invoice download
+- Filter by date/status
+- Search bookings
+
+### **2.7 Ticket Viewer** (`/ticket/:ticketId`)
+**Purpose:** Display digital ticket for entry
+- Full-screen QR code (encrypted, time-based validation)
+- Ticket information (event, date, seat/tier, attendee name)
+- Booking reference number
+- Entry instructions
+- Venue location with directions
+- Organizer contact info
+- Ticket validity status indicator
+- "Add to Wallet" (Apple Wallet, Google Pay)
+- Offline mode support (PWA)
+- Screenshot detection warning
+
+### **2.8 Profile Page** (`/profile`)
+**Purpose:** User account management
+- Profile photo update
+- Personal information (name, email, phone, DOB)
+- Address management
+- Password change
+- Notification preferences (email, SMS, push)
+- Language selection
+- Linked social accounts
+- Payment methods management
+- Privacy settings
+- Account deletion option
+- Activity log
+
+### **2.9 Favorites/Saved Events** (`/saved-events`)
+**Purpose:** Wishlist management
+- Grid of saved events
+- Remove from favorites
+- Quick booking from saved events
+- Price drop alerts toggle
+- Filter by date/category
+- Share saved list
+
+### **2.10 Notifications** (`/notifications`)
+**Purpose:** Communication center
+- Notification list (chronological)
+- Categories: Booking updates, Event reminders, Promotions, System alerts
+- Mark as read functionality
+- Delete notifications
+- Notification settings link
+- Real-time updates via WebSocket
+
+***
+
+## **3. Organizer Pages** (Role: Organizer)
+
+### **3.1 Organizer Dashboard** (`/organizer/dashboard`)
+**Purpose:** Central command center for event operations
+- Key metrics cards (total events, active bookings, revenue, attendees)
+- Revenue chart (daily/weekly/monthly)
+- Recent bookings table
+- Event performance comparison
+- Upcoming events timeline
+- Quick actions (create event, manage gates, view reports)
+- IoT device status overview
+- Alerts panel (capacity warnings, device issues)
+- Calendar view of all events
+
+### **3.2 Create Event** (`/organizer/create-event`)
+**Purpose:** Event creation workflow
+- Multi-step form with progress indicator
+- **Step 1: Basic Info** (title, category, description, images/video)
+- **Step 2: Schedule** (date, time, duration, timezone)
+- **Step 3: Venue** (location, address, map picker, capacity)
+- **Step 4: Ticketing** (ticket tiers, pricing, quantities, early bird)
+- **Step 5: Additional** (amenities, age restrictions, refund policy)
+- **Step 6: IoT Setup** (gateway assignment, access rules)
+- **Step 7: Preview & Publish**
+- Save as draft functionality
+- Template library for recurring events
+- Duplicate event option
+
+### **3.3 Manage Events** (`/organizer/events`)
+**Purpose:** Event portfolio overview
+- Event list with status (Draft, Published, Ongoing, Completed, Cancelled)
+- Filter by status, date, category
+- Search events
+- Event cards with quick stats (bookings, revenue, capacity %)
+- Quick actions per event (edit, view analytics, manage gates, cancel)
+- Bulk actions (publish multiple, export data)
+- Archive old events
+
+### **3.4 Event Editor** (`/organizer/events/:eventId/edit`)
+**Purpose:** Modify existing event details
+- Same form structure as create event
+- Version history tracking
+- Change log visible to attendees
+- Notification option for attendees about updates
+- Reschedule event with attendee notification
+- Cancel event with refund processing
+
+### **3.5 Participants Management** (`/organizer/events/:eventId/participants`)
+**Purpose:** Attendee tracking and management
+- Participants table (name, email, ticket type, booking date, check-in status)
+- Export attendees list (CSV/Excel)
+- Search and filter participants
+- Bulk actions (send message, check-in manually)
+- Check-in statistics (total, checked-in, pending)
+- Real-time check-in feed
+- Refund management
+- Attendee communication tool (email/SMS broadcast)
+- Individual attendee details view
+
+### **3.6 IoT Gateway Management** (`/organizer/iot-management`)
+**Purpose:** Access control hardware configuration
+- Gateway device list with status (online/offline)
+- Device health indicators (battery, connectivity, last ping)
+- Gate assignment to events
+- Access rules configuration (time windows, ticket tiers)
+- Remote gate control (open/close/lock)
+- Device settings (sensor sensitivity, display messages)
+- Activity log per gateway
+- Add new gateway wizard
+- Firmware update management
+- Troubleshooting diagnostics
+
+### **3.7 Crowd Monitoring** (`/organizer/events/:eventId/crowd`)
+**Purpose:** Real-time venue occupancy tracking
+- Live occupancy gauge (current/maximum)
+- Entry/exit rate graph (real-time)
+- Heatmap of venue zones (if multiple gates)
+- Capacity threshold alerts
+- Historical occupancy trends
+- Peak hours analysis
+- Entry queue status
+- Emergency evacuation tools
+- Zone-wise occupancy breakdown
+- Predictive crowd flow analytics
+
+### **3.8 Access Logs** (`/organizer/events/:eventId/access-logs`)
+**Purpose:** Entry audit trail
+- Log table (timestamp, attendee name, gate, QR code, status)
+- Filter by time range, gate, status (approved/denied)
+- Search by attendee
+- Export logs
+- Failed access attempts flagged
+- Duplicate entry detection
+- Real-time log updates
+- Analytics (busiest gates, peak entry times)
+
+### **3.9 Analytics & Reports** (`/organizer/analytics`)
+**Purpose:** Business intelligence
+- Revenue dashboard (total, by event, by ticket tier)
+- Sales funnel (views → bookings → revenue)
+- Booking trends over time
+- Demographic insights (age, location)
+- Popular ticket tiers analysis
+- Refund and cancellation statistics
+- Device performance metrics
+- Custom date range selection
+- Export reports (PDF/Excel)
+- Comparison with past events
+
+### **3.10 Revenue Reports** (`/organizer/revenue`)
+**Purpose:** Financial tracking
+- Revenue by event table
+- Payment method breakdown
+- Payout history (to organizer bank)
+- Pending settlements
+- Tax reports
+- Commission breakdown (platform fees)
+- Monthly financial summary
+- Invoice generation
+- Download financial statements
+
+### **3.11 Marketing Tools** (`/organizer/marketing`)
+**Purpose:** Event promotion
+- Promo code creation and management
+- Email campaign builder (attendee segmentation)
+- SMS broadcast tool
+- Social media post scheduler
+- Affiliate link generator
+- Discount strategy planner
+- Campaign performance tracking
+- Referral program management
+
+### **3.12 Organizer Profile** (`/organizer/profile`)
+**Purpose:** Organizer account settings
+- Organization details (name, logo, description)
+- Verification status and documents
+- Bank account for payouts
+- Notification preferences
+- Team member management (multi-user access)
+- Subscription plan details
+- API keys for integrations
+- Contact information
+
+***
+
+## **4. Admin Pages** (Role: Admin)
+
+### **4.1 Admin Dashboard** (`/admin/dashboard`)
+**Purpose:** Platform-wide overview
+- Global metrics (total users, organizers, events, revenue)
+- Platform health indicators
+- Recent user registrations
+- Pending organizer approvals
+- System alerts (server issues, payment failures)
+- Revenue trends (platform commission)
+- Active events count
+- IoT device fleet status
+- Quick actions (approve organizers, view reports, system settings)
+
+### **4.2 User Management** (`/admin/users`)
+**Purpose:** User account administration
+- User table (ID, name, email, role, status, registration date)
+- Search and filter users
+- User details view (booking history, activity)
+- Suspend/ban user accounts
+- Reset user passwords
+- Role elevation (user → organizer)
+- Export user data
+- Bulk actions
+- User activity logs
+
+### **4.3 Organizer Management** (`/admin/organizers`)
+**Purpose:** Organizer verification and oversight
+- Organizer applications (pending approval)
+- Verification workflow (document review)
+- Approve/reject applications
+- Active organizers list
+- Organizer performance metrics
+- Suspend organizer accounts
+- Commission rate management
+- Organizer support tickets
+- Compliance monitoring
+
+### **4.4 Event Moderation** (`/admin/events`)
+**Purpose:** Platform content control
+- All events across platform
+- Flag inappropriate events
+- Event approval workflow (if required)
+- Force cancel events (policy violations)
+- Featured event selection
+- Event category management
+- Event reports from users
+- Edit event details (override)
+
+### **4.5 System Analytics** (`/admin/analytics`)
+**Purpose:** Platform performance insights
+- User growth charts
+- Event creation trends
+- Booking conversion rates
+- Revenue by category
+- Geographic distribution
+- Platform usage statistics (peak hours, popular features)
+- Payment gateway performance
+- IoT device utilization
+- Custom report builder
+
+### **4.6 Device Health Monitor** (`/admin/devices`)
+**Purpose:** IoT fleet management
+- All registered devices across platform
+- Device status dashboard (online/offline/error)
+- Device assignment tracking (which organizer/event)
+- Firmware version monitoring
+- Remote diagnostics
+- Bulk firmware updates
+- Device replacement workflow
+- Maintenance scheduling
+- Performance metrics (uptime, error rates)
+- Alert configuration
+
+### **4.7 Payment Management** (`/admin/payments`)
+**Purpose:** Financial operations oversight
+- All transactions table
+- Payment status monitoring
+- Failed payment investigation
+- Refund approvals (high-value)
+- Payout scheduling to organizers
+- Payment gateway settings
+- Commission tracking
+- Financial reconciliation
+- Fraud detection alerts
+
+### **4.8 Support & Tickets** (`/admin/support`)
+**Purpose:** Customer support operations
+- Support ticket queue
+- Ticket assignment to support staff
+- Ticket status tracking (open/in-progress/resolved)
+- Canned responses library
+- User/organizer communication
+- Escalation management
+- SLA tracking
+- Satisfaction ratings
+
+### **4.9 Content Management** (`/admin/content`)
+**Purpose:** Platform content control
+- Homepage banner management
+- Featured events carousel
+- Blog posts (if applicable)
+- Help documentation editor
+- FAQ management
+- Email template editor
+- Push notification composer
+- Terms & conditions versioning
+
+### **4.10 System Settings** (`/admin/settings`)
+**Purpose:** Platform configuration
+- General settings (platform name, logo, timezone)
+- Payment gateway configuration
+- Commission rates by category
+- Email/SMS service settings
+- IoT device default configurations
+- Security settings (2FA enforcement, password policies)
+- API rate limits
+- Feature flags (enable/disable features)
+- Backup and restore
+- Maintenance mode toggle
+
+### **4.11 Logs & Audit Trail** (`/admin/logs`)
+**Purpose:** System monitoring and compliance
+- System error logs
+- User activity audit trail
+- Admin action logs
+- API request logs
+- Security event logs (failed logins, suspicious activity)
+- Filter by severity, user, date
+- Export logs for compliance
+- Real-time log streaming
+
+### **4.12 Chatbot Management** (`/admin/chatbot`)
+**Purpose:** AI assistant configuration
+- Chatbot training data management
+- Conversation logs review
+- Response quality analytics
+- Intent configuration
+- Fallback responses editor
+- Language model settings
+- Integration testing
+- Performance metrics (resolution rate, user satisfaction)
+
+***
+
+## **5. Shared/Common Pages**
+
+### **5.1 About Us** (`/about`)
+**Purpose:** Platform information
+- Company story
+- Mission and vision
+- Team members
+- Awards and recognition
+- Contact information
+
+### **5.2 Help Center** (`/help`)
+**Purpose:** Self-service support
+- FAQ categorized by topic
+- How-to guides with screenshots
+- Video tutorials
+- Troubleshooting common issues
+- Contact support form
+- AI chatbot integration
+
+### **5.3 Contact Us** (`/contact`)
+**Purpose:** Communication channel
+- Contact form
+- Office locations with map
+- Phone numbers by department
+- Email addresses
+- Social media links
+- Business hours
+
+### **5.4 Terms & Conditions** (`/terms`)
+**Purpose:** Legal agreement
+- User terms
+- Organizer terms
+- Platform usage policies
+- Version history
+- Acceptance tracking
+
+### **5.5 Privacy Policy** (`/privacy`)
+**Purpose:** Data protection disclosure
+- Data collection practices
+- Cookie policy
+- Third-party integrations
+- User rights (GDPR compliance)
+- Contact for privacy concerns
+
+### **5.6 Refund Policy** (`/refund-policy`)
+**Purpose:** Refund guidelines
+- Refund eligibility criteria
+- Process and timeline
+- Organizer-specific policies
+- Exceptions and special cases
+
+### **5.7 404 Error Page** (`/404`)
+**Purpose:** Handle broken links
+- Friendly error message
+- Search bar
+- Popular pages links
+- Return to homepage button
+
+### **5.8 Unauthorized Page** (`/unauthorized`)
+**Purpose:** Access denial
+- Explanation of insufficient permissions
+- Contact admin option
+- Return to appropriate dashboard
+
+### **5.9 Maintenance Page** (`/maintenance`)
+**Purpose:** Scheduled downtime
+- Maintenance notice
+- Expected duration
+- Alternative contact methods
+- Status page link
+
+***
+
+## **Navigation Structure Summary**
+
+### **User Navigation Menu**
+- Home
+- Events
+- My Bookings
+- Saved Events
+- Profile
+- Notifications
+- Help
+
+### **Organizer Navigation Menu**
+- Dashboard
+- Create Event
+- My Events
+- Participants
+- IoT Management
+- Crowd Monitoring
+- Analytics
+- Revenue
+- Marketing
+- Profile
+
+### **Admin Navigation Menu**
+- Dashboard
+- Users
+- Organizers
+- Events
+- Analytics
+- Devices
+- Payments
+- Support
+- Content
+- Settings
+- Logs
+- Chatbot
+
+***
+
+This comprehensive page structure supports all functionalities of FlowGateX across three user roles with clear navigation paths and purpose-driven interfaces.[2][4][1]
+
+[1](https://www.eventdex.com/event-management-software-features/)
+[2](https://theonetechnologies.com/blog/post/event-management-software-features-checklist)
+[3](https://info.6connex.com/blog/30-must-have-event-management-software-features)
+[4](https://www.bizzabo.com/blog/event-management-software-features)

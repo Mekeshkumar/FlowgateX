@@ -1,0 +1,574 @@
+/* ============================================================================
+   FlowGateX Layout - Custom CSS Enhancements
+   ============================================================================ */
+
+/* Premium Sidebar Animations */
+@keyframes slide-in-from-left {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes zoom-in-95 {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.animate-in {
+    animation-duration: 0.2s;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    animation-fill-mode: both;
+}
+
+.slide-in-from-left {
+    animation-name: slide-in-from-left;
+}
+
+.fade-in {
+    animation-name: fade-in;
+}
+
+.zoom-in-95 {
+    animation-name: zoom-in-95;
+}
+
+/* Sidebar Item Hover Effects */
+.sidebar-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebar-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--brand-primary);
+    transform: scaleY(0);
+    transition: transform 0.2s ease-out;
+    border-radius: 0 2px 2px 0;
+}
+
+.sidebar-item:hover::before,
+.sidebar-item.sidebar-active::before {
+    transform: scaleY(1);
+}
+
+/* Sidebar Icon Animations */
+.sidebar-icon {
+    transition: transform 0.2s ease-out, color 0.2s ease-out;
+}
+
+.sidebar-item:hover .sidebar-icon {
+    transform: scale(1.1);
+}
+
+/* Submenu Animations */
+.submenu-transition {
+    transition: max-height 0.3s ease-out, opacity 0.2s ease-out;
+}
+
+.submenu-popup {
+    animation: submenuFadeIn 0.2s ease-out;
+}
+
+@keyframes submenuFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Tooltip Animations */
+.sidebar-tooltip {
+    animation: tooltipFadeIn 0.15s ease-out;
+}
+
+@keyframes tooltipFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50%) translateX(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0);
+    }
+}
+
+/* Tooltip Arrow */
+.tooltip-arrow {
+    clip-path: polygon(0 50%, 100% 0, 100% 100%);
+}
+
+/* Custom Scrollbar for Sidebar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--brand-primary), var(--brand-primary-dark));
+    border-radius: 10px;
+    transition: background 0.3s;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--brand-primary);
+}
+
+/* Hide scrollbar until hover */
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+}
+
+.custom-scrollbar:hover {
+    scrollbar-color: var(--border-primary) transparent;
+}
+
+/* Sidebar Collapse Transition */
+.sidebar-collapse-transition {
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Quick Action Card Hover */
+.quick-action-card {
+    transition: all 0.2s ease-out;
+}
+
+.quick-action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(235, 22, 22, 0.15);
+}
+
+/* Stats Widget Number Animation */
+@keyframes countUp {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.stat-number {
+    animation: countUp 0.3s ease-out;
+}
+
+/* Device Status Indicator Pulse */
+@keyframes statusPulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.status-online {
+    animation: statusPulse 2s ease-in-out infinite;
+}
+
+/* Pulse Dot Animation */
+@keyframes pulse-dot {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.animate-pulse-dot {
+    animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* Mobile FAB Pulse */
+@keyframes fabPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 4px 16px rgba(235, 22, 22, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 4px 24px rgba(235, 22, 22, 0.5);
+    }
+}
+
+/* Profile Card Hover Effect */
+.profile-card-hover:hover {
+    background: linear-gradient(135deg,
+            var(--bg-hover) 0%,
+            rgba(235, 22, 22, 0.05) 100%);
+}
+
+/* Search Input Focus Glow */
+.search-glow:focus {
+    box-shadow: 0 0 0 3px rgba(235, 22, 22, 0.1);
+}
+
+/* Badge Pulse Animation */
+@keyframes badge-pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.badge-animate {
+    animation: badge-pulse 2s ease-in-out infinite;
+}
+
+/* Icon Bounce Animation */
+.icon-bounce:hover .material-icons-outlined {
+    animation: iconBounce 0.3s ease-out;
+}
+
+@keyframes iconBounce {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.15);
+    }
+}
+
+/* Mobile Sidebar Backdrop Blur */
+.sidebar-backdrop {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* Gradient Border Effect */
+.gradient-border {
+    position: relative;
+}
+
+.gradient-border::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-dark));
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.2s ease-out;
+}
+
+.gradient-border:hover::after {
+    opacity: 1;
+}
+
+/* Active Menu Glow */
+.active-glow {
+    box-shadow:
+        inset 0 0 20px rgba(235, 22, 22, 0.1),
+        0 0 20px rgba(235, 22, 22, 0.05);
+}
+
+/* Hover Lift Effect */
+.hover-lift {
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+.hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Red Shadow Utilities */
+.shadow-red-sm {
+    box-shadow: 0 2px 8px rgba(235, 22, 22, 0.15);
+}
+
+.shadow-red-md {
+    box-shadow: 0 4px 16px rgba(235, 22, 22, 0.2);
+}
+
+.shadow-red-lg {
+    box-shadow: 0 8px 32px rgba(235, 22, 22, 0.25);
+}
+
+/* Floating Sidebar Enhancement */
+.floating-sidebar {
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.05),
+        0 4px 24px -4px rgba(0, 0, 0, 0.4),
+        0 12px 48px -8px rgba(0, 0, 0, 0.3),
+        0 0 80px -20px rgba(235, 22, 22, 0.1);
+}
+
+[data-theme="light"] .floating-sidebar {
+    box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.05),
+        0 4px 24px -4px rgba(0, 0, 0, 0.1),
+        0 12px 48px -8px rgba(0, 0, 0, 0.08);
+}
+
+/* Glassmorphism Effect */
+.glass-effect {
+    background: rgba(26, 26, 26, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+[data-theme="light"] .glass-effect {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+/* Notification Dot */
+.notification-dot {
+    position: relative;
+}
+
+.notification-dot::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    background: var(--brand-primary);
+    border-radius: 50%;
+    border: 2px solid var(--bg-card);
+}
+
+/* Responsive Adjustments */
+@media (max-height: 700px) {
+    .floating-sidebar nav {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+
+    .floating-sidebar .sidebar-item {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+}
+
+/* Smooth Transitions */
+.transition-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Active State Gradient */
+.active-gradient {
+    background: linear-gradient(90deg,
+            rgba(235, 22, 22, 0.15) 0%,
+            transparent 100%);
+}
+
+/* Keyboard Shortcut Badge */
+kbd {
+    font-family: var(--font-mono);
+    background: var(--bg-hover);
+    border: 1px solid var(--border-primary);
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+/* Mobile Drawer Animation */
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+/* Overlay Fade Animation */
+@keyframes overlayFade {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Focus Ring Enhancement */
+.focus-ring-enhanced {
+    outline: none;
+    transition: box-shadow 0.15s ease;
+}
+
+.focus-ring-enhanced:focus {
+    box-shadow: 0 0 0 3px rgba(235, 22, 22, 0.12);
+}
+
+/* Sidebar Toggle Button */
+.sidebar-toggle {
+    transition: all 0.2s ease-out;
+}
+
+.sidebar-toggle:hover {
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 4px 12px rgba(235, 22, 22, 0.2);
+}
+
+/* Menu Item Glow on Hover */
+.sidebar-item-glow:hover {
+    box-shadow: 0 0 12px rgba(235, 22, 22, 0.1);
+}
+
+/* Smooth Color Transitions */
+* {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+/* Prevent transition on theme change */
+.theme-transition-disable * {
+    transition: none !important;
+}
+
+/* Enhanced Active State */
+.sidebar-active {
+    position: relative;
+}
+
+.sidebar-active::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    background: var(--brand-primary);
+    border-radius: 2px 0 0 2px;
+}
+
+/* Submenu Container */
+.submenu-container {
+    transform-origin: top;
+}
+
+/* Enhanced Hover Effects */
+.enhanced-hover {
+    position: relative;
+    overflow: hidden;
+}
+
+.enhanced-hover::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(235, 22, 22, 0.05), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.enhanced-hover:hover::before {
+    opacity: 1;
+}
+
+/* Mobile Specific Enhancements */
+@media (max-width: 1024px) {
+    .mobile-optimized {
+        -webkit-tap-highlight-color: rgba(235, 22, 22, 0.1);
+    }
+
+    .mobile-drawer {
+        box-shadow:
+            0 0 0 1px rgba(0, 0, 0, 0.1),
+            0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+}
+
+/* Accessibility Enhancements */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Focus Visible for Keyboard Navigation */
+*:focus-visible {
+    outline: 2px solid var(--brand-primary);
+    outline-offset: 2px;
+}
+
+/* Reduce Motion for Accessibility */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

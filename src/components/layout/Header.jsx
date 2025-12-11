@@ -33,7 +33,8 @@ const EVENTS = [
 const Header = ({
   showSidebarTrigger = false,
   isSidebarCollapsed = false,
-  onToggleSidebar = () => { }
+  onSidebarCollapse = () => { },
+  ...props
 }) => {
   // ===========================
   // STATE MANAGEMENT
@@ -165,7 +166,7 @@ const Header = ({
               {/* 0. SIDEBAR TOGGLE */}
               {showSidebarTrigger && !isScrolled && (
                 <button
-                  onClick={onToggleSidebar}
+                  onClick={onSidebarCollapse}
                   className="hidden lg:flex items-center justify-center w-10 h-10 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-primary)] text-[var(--text-secondary)] hover:text-[var(--brand-primary)] hover:border-[var(--brand-primary)] hover:bg-[var(--bg-hover)] transition-all duration-200 shrink-0"
                   aria-label={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
                   title={isSidebarCollapsed ? 'Expand sidebar (Ctrl+B)' : 'Collapse sidebar (Ctrl+B)'}
